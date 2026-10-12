@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline Class & Quiz Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Offline Learning Workspace</p>
+      <h1>Class & Quiz Studio</h1>
+    </div>
+    <div class="header-actions">
+      <button id="themeToggleBtn" class="ghost-btn icon-btn" type="button" aria-label="Switch theme">🌙</button>
+      <button id="helpBtn" class="ghost-btn" type="button">Guide / Help</button>
+    </div>
+  </header>
+
+  <main id="appMain" class="layout">
+    <section class="content">
+      <nav class="tabs app-tabs" aria-label="App sections" role="tablist">
+        <button class="tab active" type="button" data-view="dashboardView" role="tab" aria-selected="true" aria-controls="dashboardView">Dashboard</button>
+        <button class="tab" type="button" data-view="classView" role="tab" aria-selected="false" aria-controls="classView">Class detail</button>
+        <button class="tab" type="button" data-view="quizView" role="tab" aria-selected="false" aria-controls="quizView">Quizzes</button>
+      </nav>
+
+      <section id="dashboardView" class="view active" role="tabpanel">
+        <div class="section-heading">
+          <div><p class="eyebrow">Dashboard</p><h2>Your Classes</h2></div>
+          <div class="actions"><p id="classCount" class="pill">0 classes</p><button id="showClassFormBtn" class="primary-btn" type="button" aria-expanded="false" aria-controls="classModal">Create Class</button></div>
+        </div>
+        <div id="classCards" class="card-grid"></div>
+      </section>
+
+      <section id="classView" class="view" role="tabpanel">
+        <div id="emptyClassState" class="empty-state">Select a class from the dashboard to manage materials and quizzes.</div>
+        <div id="classDetail" class="hidden">
+          <div class="section-heading">
+            <div><p class="eyebrow">Class Detail</p><h2 id="detailTitle"></h2><p id="detailMeta"></p><div id="classDetailSwitcher"></div></div>
+            <div class="actions"><button id="editClassBtn" class="secondary-btn">Edit</button><button id="deleteClassBtn" class="danger-btn">Delete</button></div>
+          </div>
+
+          <div class="two-column">
+            <section class="panel">
+              <h3>Add material / note</h3>
+              <form id="materialForm" class="stack">
+                <input id="materialTitle" required placeholder="Lecture notes week 1" />
+                <textarea id="materialBody" rows="6" placeholder="Paste notes, links, reminders, or reading tasks..."></textarea>
+                <label class="file-label">Attach material file
+                  <input id="materialFile" type="file" accept=".txt,.md,.pdf,.docx,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                </label>
+                <p class="muted small-text">Text and Markdown files are previewed when small. PDF/DOCX and large files are saved as offline attachment metadata.</p>
+                <div id="materialStatus" class="form-message" role="status" aria-live="polite"></div>
+                <button class="primary-btn" type="submit">Add material</button>
+              </form>
+              <div id="materialsList" class="list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="section-heading compact-heading">
+                <div><h3>Quizzes</h3><p class="muted">Upload Markdown or create a quiz manually.</p></div>
+                <button id="createQuizBtn" class="primary-btn" type="button">Create Quiz</button>
+              </div>
+              <input id="quizFile" type="file" accept=".md,text/markdown,text/plain" />
+              <div id="parserMessage" role="alert"></div>
+              <div id="quizPreview" class="preview hidden"></div>
+              <button id="saveQuizBtn" class="primary-btn hidden">Save generated quiz</button>
+              <h3>Saved quizzes</h3>
+              <div id="quizzesList" class="list"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="quizView" class="view" role="tabpanel">
+        <div id="quizArea" class="panel">Select a class to see quizzes.</div>
+      </section>
+    </section>
+  </main>
+
+  <template id="classCardTemplate">
+    <article class="class-card">
+      <div class="card-top"><span class="avatar"></span><span class="pill"></span></div>
+      <h3></h3><p></p>
+      <div class="card-stats"></div>
+      <button class="secondary-btn">Open class</button>
+    </article>
+  </template>
+
+  <div id="classModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="classModalTitle">
+    <div class="modal-card class-modal-card">
+      <button class="modal-close ghost-btn" data-close="classModal" aria-label="Close class form">✕</button>
+      <p class="eyebrow">Class Setup</p>
+      <h2 id="classModalTitle">Create Class</h2>
+      <form id="classForm" class="stack class-modal-form">
+        <input type="hidden" id="classId" />
+        <label>Class name<input id="className" required placeholder="Biology 101" /></label>
+        <label>Teacher / subject<input id="classTeacher" placeholder="Ms. Rivera" /></label>
+        <label>Description<textarea id="classDescription" rows="4" placeholder="Short class description"></textarea></label>
+        <fieldset class="icon-fieldset">
+          <legend>Class icon</legend>
+          <div class="icon-customizer">
+            <div id="classIconPreview" class="class-icon large" role="img" aria-label="Class icon preview">📘</div>
+            <div class="icon-controls">
+              <div class="color-tools">
+                <div class="tabs color-mode-tabs" role="tablist" aria-label="Class icon color input mode">
+                  <button id="colorPresetsTab" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="colorPresetsPanel" data-color-mode="presets">Presets</button>
+                  <button id="colorHexTab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="colorHexPanel" data-color-mode="hex">Hex</button>
+                  <button id="colorRgbTab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="colorRgbPanel" data-color-mode="rgb">RGB</button>
+                </div>
+                <div id="colorPresetsPanel" class="color-panel" role="tabpanel" aria-labelledby="colorPresetsTab">
+                  <span class="field-label">Preset colors</span>
+                  <div id="classIconPalette" class="color-palette" role="radiogroup" aria-label="Class icon preset colors"></div>
+                </div>
+                <div id="colorHexPanel" class="color-panel hidden" role="tabpanel" aria-labelledby="colorHexTab">
+                  <label>Visual picker<input id="classIconColor" type="color" value="#4f46e5" /></label>
+                  <label>Hex color<input id="classIconHex" inputmode="text" maxlength="7" placeholder="#4f46e5" aria-describedby="classIconHexHelp" /></label>
+                  <p id="classIconHexHelp" class="muted small-text">Use a 6-digit value such as #4f46e5.</p>
+                </div>
+                <div id="colorRgbPanel" class="color-panel rgb-controls hidden" role="tabpanel" aria-labelledby="colorRgbTab" aria-label="RGB color controls">
+                  <label>Red <input id="classIconRed" type="range" min="0" max="255" /></label>
+                  <label>Green <input id="classIconGreen" type="range" min="0" max="255" /></label>
+                  <label>Blue <input id="classIconBlue" type="range" min="0" max="255" /></label>
+                  <div class="rgb-number-grid">
+                    <input id="classIconRedNumber" type="number" min="0" max="255" aria-label="Red value" />
+                    <input id="classIconGreenNumber" type="number" min="0" max="255" aria-label="Green value" />
+                    <input id="classIconBlueNumber" type="number" min="0" max="255" aria-label="Blue value" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-grid icon-grid">
+                <label>Style<select id="classIconStyle"><option>Solid</option><option>Gradient</option><option>Pattern</option></select></label>
+                <label>Shape<select id="classIconShape"><option>Rounded square</option><option>Circle</option><option>Square</option><option>Hexagon</option></select></label>
+              </div>
+              <label>Emoji<input id="classIconEmoji" maxlength="4" placeholder="📘" /></label>
+              <label class="file-label">Custom image icon
+                <input id="classIconImage" type="file" accept="image/*" />
+              </label>
+              <input type="hidden" id="classIconImageData" />
+              <p class="muted small-text">Images must be under 200 KB. They are stored locally as Data URLs.</p>
+              <button id="resetClassIconBtn" class="ghost-btn" type="button">Reset icon</button>
+            </div>
+          </div>
+        </fieldset>
+        <div id="classStatus" class="form-message" role="status" aria-live="polite"></div>
+        <div class="actions class-modal-actions"><button id="classSubmitBtn" class="primary-btn" type="submit">Add Class</button>
+        <button class="ghost-btn" type="button" id="cancelEditClass">Cancel / Close</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="helpModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-card help-card">
+      <button class="modal-close ghost-btn" data-close="helpModal" aria-label="Close help">✕</button>
+      <p class="eyebrow">Offline Guide</p>
+      <h2 id="helpTitle">Guide / Help</h2>
+      <div class="tabs help-tabs" aria-label="Guide sections" role="tablist">
+        <button class="tab active" type="button" data-help-tab="quick" role="tab" aria-selected="true" aria-controls="helpMarkdownPreview">Quick Guide</button>
+        <button class="tab" type="button" data-help-tab="sample" role="tab" aria-selected="false" aria-controls="helpMarkdownPreview">Sample Data</button>
+        <button class="tab" type="button" data-help-tab="ai" role="tab" aria-selected="false" aria-controls="helpMarkdownPreview">AI Quiz Context</button>
+        <button class="tab" type="button" data-help-tab="data" role="tab" aria-selected="false" aria-controls="helpMarkdownPreview">Data / Backup</button>
+      </div>
+      <div id="helpTabActions" class="actions help-actions"></div>
+      <pre id="helpMarkdownPreview" class="markdown-preview" tabindex="0" role="tabpanel" aria-live="polite"></pre>
+    </div>
+  </div>
+
+  <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <div class="modal-card history-card">
+      <button class="modal-close ghost-btn" data-close="historyModal" aria-label="Close attempt history">✕</button>
+      <p class="eyebrow">Quiz Attempts</p>
+      <h2 id="historyTitle">Attempt History</h2>
+      <div id="historyContent"></div>
+      <div class="actions"><button id="clearHistoryBtn" class="danger-btn" type="button">Clear History</button></div>
+    </div>
+  </div>
+
+  <div id="builderModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="builderTitle">
+    <div class="modal-card builder-card">
+      <button class="modal-close ghost-btn" data-close="builderModal" aria-label="Close builder">✕</button>
+      <p class="eyebrow">Quiz Builder</p>
+      <h2 id="builderTitle">Create Quiz</h2>
+      <div id="builderDraftActions" class="actions hidden"><button id="restoreBuilderDraftBtn" class="secondary-btn" type="button">Restore draft</button><button id="discardBuilderDraftBtn" class="danger-btn" type="button">Discard draft</button></div>
+      <form id="quizBuilderForm" class="stack">
+        <input type="hidden" id="builderQuizId" />
+        <div class="form-grid">
+          <label>Quiz title<input id="builderTitleInput" required placeholder="Cell Biology Review" /></label>
+          <label>Time limit<input id="builderTime" type="number" min="1" value="10" /></label>
+          <label>Points<input id="builderPoints" type="number" min="1" value="10" /></label>
+        </div>
+        <hr />
+        <div class="builder-workspace">
+          <aside class="builder-sidebar" aria-label="Quiz questions">
+            <div class="builder-sidebar-head">
+              <h3>Questions</h3>
+              <p class="muted small-text">Drag to reorder or use Move buttons.</p>
+            </div>
+            <div id="builderQuestionList" class="builder-question-list compact-list"></div>
+          </aside>
+          <section class="builder-editor" aria-labelledby="questionEditorTitle">
+            <h3 id="questionEditorTitle">Add question</h3>
+            <input type="hidden" id="builderQuestionIndex" value="" />
+            <div class="builder-help" aria-labelledby="builderHelpTitle">
+              <div class="builder-help-head">
+                <h4 id="builderHelpTitle">Question help</h4>
+                <div class="tabs builder-help-tabs" role="tablist" aria-label="Builder help mode">
+                  <button id="builderGuideTab" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="builderHelpContent" data-builder-help="guide">Guide</button>
+                  <button id="builderExampleTab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="builderHelpContent" data-builder-help="examples">Examples</button>
+                </div>
+              </div>
+              <pre id="builderHelpContent" class="builder-help-content" role="tabpanel" aria-live="polite"></pre>
+            </div>
+            <label>Question type<select id="builderType"><option>Multiple Choice</option><option>Multiple Responses</option><option>Matching</option><option>True or False</option><option>Identification</option><option>Fill in the Blank</option><option>Enumeration</option></select></label>
+            <label>Question prompt<textarea id="builderPrompt" rows="3" placeholder="Write the question..."></textarea></label>
+            <label id="builderOptionsWrap">Options / matching pairs<textarea id="builderOptions" rows="5" placeholder="A. First option&#10;B. Second option&#10;C. Third option&#10;D. Fourth option"></textarea></label>
+            <label>Correct answer(s)<textarea id="builderAnswers" rows="3" placeholder="Use one answer per line. Multiple choice accepts A-Z; multiple responses can use A, C or one letter per line. Matching answers come from pairs."></textarea></label>
+            <div class="actions"><button id="addQuestionBtn" class="secondary-btn" type="button">Add Question</button><button id="clearQuestionBtn" class="ghost-btn" type="button">Clear Question</button></div>
+          </section>
+        </div>
+        <div id="builderStatus" class="form-message" role="status"></div>
+        <div class="actions builder-save-actions"><button class="primary-btn" type="submit">Save Quiz</button><button class="ghost-btn" type="button" data-close="builderModal">Cancel</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="quizSetupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="quizSetupTitle">
+    <div class="modal-card quiz-setup-card">
+      <button class="modal-close ghost-btn" data-close="quizSetupModal" aria-label="Close quiz setup">✕</button>
+      <p class="eyebrow">Attempt Setup</p>
+      <h2 id="quizSetupTitle">Start Quiz</h2>
+      <form id="quizSetupForm" class="stack">
+        <input type="hidden" id="quizSetupId" />
+        <p id="quizSetupSummary" class="muted"></p>
+        <fieldset class="setup-fieldset">
+          <legend>Question order</legend>
+          <label class="inline-check"><input id="setupShuffle" type="checkbox" /> Shuffle questions for this attempt</label>
+          <p class="muted small-text">Shuffle never changes the saved quiz. Preview and edit keep the original order.</p>
+          <button id="setupResetOrder" class="ghost-btn" type="button">Use original order</button>
+        </fieldset>
+        <fieldset class="setup-fieldset">
+          <legend>Display mode</legend>
+          <label class="inline-check"><input type="radio" name="setupDisplayMode" value="paged" checked /> Multiple questions at once</label>
+          <label>Questions per page<input id="setupQuestionsPerPage" type="number" min="1" max="20" value="5" /></label>
+          <label class="inline-check"><input type="radio" name="setupDisplayMode" value="one" /> One question at a time</label>
+        </fieldset>
+        <fieldset class="setup-fieldset">
+          <legend>Whole-quiz timer</legend>
+          <label class="inline-check"><input id="setupWholeTimer" type="checkbox" /> Use whole-quiz timer</label>
+          <label>Minutes<input id="setupWholeMinutes" type="number" min="1" max="600" value="10" /></label>
+          <p class="muted small-text">When time expires, the app automatically submits the attempt.</p>
+        </fieldset>
+        <fieldset id="perQuestionSetup" class="setup-fieldset hidden">
+          <legend>Per-question timer</legend>
+          <label class="inline-check"><input id="setupQuestionTimer" type="checkbox" /> Use per-question timer</label>
+          <label>Seconds per question<input id="setupQuestionSeconds" type="number" min="10" max="3600" value="60" /></label>
+          <p class="muted small-text">Available in one-question mode. This pass uses one default time for every question; it follows the question even when shuffled.</p>
+        </fieldset>
+        <div class="actions class-modal-actions"><button class="primary-btn" type="submit">Start quiz</button><button class="ghost-btn" type="button" data-close="quizSetupModal">Cancel</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="quizOverlay" class="modal hidden quiz-modal" role="dialog" aria-modal="true" aria-labelledby="activeQuizTitle">
+    <div class="modal-card quiz-overlay-card">
+      <button id="closeQuizOverlayBtn" class="modal-close ghost-btn" type="button" aria-label="Close quiz">✕</button>
+      <div id="quizOverlayContent"></div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
