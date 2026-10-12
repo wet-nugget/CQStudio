@@ -2,6 +2,10 @@
 
 Offline Class & Quiz Studio / CQStudio is a dependency-free browser app for managing classes, learning materials, and quizzes from local static files. It is designed to work offline when served locally or from static hosting. The app uses a single classic JavaScript file and can also be opened directly with `file://`.
 
+## Screenshot
+
+_Add an optional screenshot here, for example `docs/screenshot.png`._
+
 ## Features
 
 - Class dashboard with create, edit, delete, and class-detail views.
@@ -51,7 +55,7 @@ Important behavior and limitations:
 - Data stays on the same browser/device only unless exported and imported manually.
 - Use **Guide / Help → Data / Backup → Export Data** to download a readable `cqstudio-backup-YYYY-MM-DD.json` file.
 - Import validates a CQStudio backup and replaces current app data only after confirmation. Merge import is not implemented.
-- Reset All Data clears app data from `offlineClassQuizStudio.v1` after strong confirmation and keeps the theme preference.
+- Reset All Data clears app data from `offlineClassQuizStudio.v1` after strong confirmation and keeps the theme preference. Export a backup before clearing browser storage or moving devices.
 - Clearing browser storage deletes saved classes, materials, quizzes, icons, and scores.
 - `localStorage` size limits vary by browser.
 - Small text/Markdown material files may be stored as text; large files, PDF, and DOCX attachments are metadata-only.
@@ -68,7 +72,7 @@ Open `index.html` directly, or start `python -m http.server 8000` and open `http
 From the project folder:
 
 ```bash
-cd "C:/Users/tamlc/Desktop/Pi Dev/CQStudio"
+cd "path/to/CQStudio"
 python -m http.server 8000
 ```
 
@@ -88,7 +92,7 @@ A local server is optional for desktop use and useful for mobile LAN access.
 2. Start the local server:
 
    ```bash
-   cd "C:/Users/tamlc/Desktop/Pi Dev/CQStudio"
+   cd "path/to/CQStudio"
    python -m http.server 8000
    ```
 
@@ -112,18 +116,18 @@ CQStudio is static-site compatible. Deploy the project folder contents as-is:
 - `APP_CONTEXT.md`
 - `sample-biology-quiz.md`
 - `README.md`
-- `DEPLOYMENT.md` (optional deployment reference)
+- `DEPLOYMENT.md` (deployment reference)
+
+Only the root app files are required at runtime. The failed module experiment in `archive/failed-module-refactor/` is unused; exclude it from deployment if desired.
 
 ### Vercel
 
-Use Vercel as a static site with no framework preset and no build command.
+1. Push the project to GitHub and import that repository into Vercel.
+2. Select framework preset **Other** / static.
+3. Leave build and install commands empty.
+4. Set output directory to the project root (`.`).
 
-Suggested settings:
-
-- Framework preset: Other / static
-- Build command: leave empty
-- Output directory: project root (`.`)
-- Install command: leave empty
+No build step is needed. Users on phones can open the deployed link and optionally add it to their home screen. To transfer desktop data, export a JSON backup and import it on the phone; storage does not sync. See `DEPLOYMENT.md` for details.
 
 Because the app stores data in each user's browser `localStorage`, deployed users do not share data with each other.
 
@@ -157,7 +161,7 @@ CQStudio/
 Run a JavaScript syntax check after editing `app.js`:
 
 ```bash
-cd "C:/Users/tamlc/Desktop/Pi Dev/CQStudio"
+cd "path/to/CQStudio"
 node --check app.js
 ```
 

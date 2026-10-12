@@ -1,6 +1,6 @@
 # CQStudio Deployment Guide
 
-CQStudio is a static, offline-first app. Deployment is optional. It uses a single classic script (`app.js`), so no build step or internet access is required. Direct `index.html` opening is supported where the browser permits local file APIs; a local HTTP server is recommended for testing.
+CQStudio is a static, browser-only study app. It uses root-level `index.html`, `styles.css`, and a single classic `app.js`; no backend, npm dependencies, build step, or runtime internet access is required. Deployment provides a URL but does not provide cloud storage or cross-device syncing. The archived failed module experiment is not used; exclude `archive/failed-module-refactor/` from deployment if desired.
 
 ## Pre-Deployment Checklist
 
@@ -8,7 +8,7 @@ CQStudio is a static, offline-first app. Deployment is optional. It uses a singl
 - [ ] Run the JavaScript syntax check:
 
   ```bash
-  cd "C:/Users/tamlc/Desktop/Pi Dev/CQStudio"
+  cd "path/to/CQStudio"
   node --check app.js
   ```
 
@@ -40,19 +40,20 @@ No build command, install command, backend, database, or environment variables a
 
 ## Vercel Static Deployment
 
-Recommended project settings:
+1. Push the project to a GitHub repository (include `index.html`, `styles.css`, and `app.js` at its root).
+2. In Vercel, import that repository.
+3. Choose framework preset **Other** / static.
+4. Leave build and install commands empty; set output directory to `.` (project root).
+5. Deploy, open the resulting URL, and repeat the app/data checks.
 
-- Framework preset: Other / static
-- Build command: empty
-- Install command: empty
-- Output directory: `.` / project root
-
-After deployment, open the site URL and complete the pre-deployment checklist again.
+Do not deploy the unused archive folder unless you specifically want to retain it in the published files.
 
 ## Local Server Test
 
+You can open `index.html` directly on desktop, or serve the project locally for HTTP/mobile testing:
+
 ```bash
-cd "C:/Users/tamlc/Desktop/Pi Dev/CQStudio"
+cd "path/to/CQStudio"
 python -m http.server 8000
 ```
 
@@ -64,7 +65,14 @@ Open:
 http://localhost:8000
 ```
 
-For mobile LAN testing, open `http://YOUR-LAN-IP:8000` from a device on the same Wi-Fi network.
+For mobile LAN testing, open `http://YOUR-LAN-IP:8000` from a device on the same Wi-Fi network. The app can also be used on a phone from its deployed link; use the browser's Add to Home Screen option if desired. To move desktop data, export a JSON backup on desktop and import that file on the phone. Local HTTP access may require allowing Python through the computer firewall.
+
+## Troubleshooting
+
+- **Blank page:** check browser developer console for startup errors and confirm `app.js` is present at the project root.
+- **CSS/JS not loading:** verify the root-relative references in `index.html` (`styles.css`, `app.js`), filename case, and that all three files are deployed together.
+- **Data missing on phone:** `localStorage` is isolated by browser, device, and site origin. Import a desktop backup; data does not sync automatically.
+- **Server appears to hang:** this is normal; `python -m http.server 8000` stays running while serving requests. Stop it with `Ctrl+C`.
 
 ## Data and Privacy Notes
 
@@ -73,4 +81,5 @@ For mobile LAN testing, open `http://YOUR-LAN-IP:8000` from a device on the same
 - A deployed site does not create shared accounts or shared cloud storage.
 - Use Guide / Help → Data / Backup → Export Data to create a `cqstudio-backup-YYYY-MM-DD.json` file before imports, resets, or major refactors.
 - Import is replace-only in this version; merge import is not implemented.
-- Users should not treat `localStorage` as a permanent backup.
+- Quiz attempt history is included in quiz data exports. Builder drafts use a separate localStorage key and are not included in backup/reset.
+- Export data before clearing browser storage, resetting, or switching devices. Users should not treat `localStorage` as a permanent backup.
