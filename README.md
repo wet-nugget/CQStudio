@@ -1,6 +1,6 @@
 # Offline Class & Quiz Studio (CQStudio)
 
-Offline Class & Quiz Studio / CQStudio is a dependency-free browser app for managing classes, learning materials, and quizzes from local static files. It is designed to work offline when served locally or from static hosting. The app uses a single classic JavaScript file and can also be opened directly with `file://`.
+Offline Class & Quiz Studio / CQStudio is a browser-based, local-first study app for classes, lessons, materials, and quizzes. It can be opened locally or hosted as a static website, including on Vercel. It uses a single classic JavaScript file; no backend, account, or external dependency is required. A hosted copy may need internet for initial loading, but app processing and data storage are local to the browser.
 
 ## Screenshot
 
@@ -22,16 +22,24 @@ _Add an optional screenshot here, for example `docs/screenshot.png`._
   - Fill in the Blank
   - Enumeration
 - Saved quiz preview that does not start or modify an attempt.
-- Quiz attempt setup with original/shuffled order, paged or one-question display, whole-quiz timer, and default per-question timer for one-question mode.
+- Quiz Builder stores default attempt settings: original/shuffled order, paged or one-question display, page size, whole-quiz timer, and optional per-question timer.
 - Quiz-taking overlay with answer preservation across pages/questions and local scoring.
 - Per-quiz attempt history with score, date, mode, shuffle/timer settings, and time spent; history can be cleared with confirmation.
 - Debounced local autosave for manual quiz builder drafts, with restore/discard controls.
 - Completed results can be printed or downloaded as Markdown.
-- Guide / Help modal with downloadable guide, sample quiz, AI quiz-context Markdown, and Data / Backup tools.
+- Guide / Help modal with switchable quiz/lesson sample Markdown, AI context guides, and Data / Backup tools.
 - Export/import JSON backups and reset app data safely with confirmation.
 - Simple data version and migration/sanitization layer for safer future refactors.
 - Light/dark theme persistence.
 - Mobile-friendly and accessible modal/tab controls where practical.
+
+
+
+- Import `.md` / `.markdown` lesson files or paste Markdown, preview formatted content, and track class lesson progress.
+- Class Detail uses Lessons, Materials / Notes, and Quizzes sub-tabs so only one main study area is shown at a time.
+- Long quiz previews use a bounded, keyboard-focusable question scroll region; title and actions stay outside it.
+- One floating Submit Quiz action is grouped with close, remains available while scrolling, and shares the timer-expiry submission path; no bottom Submit is shown.
+- Guide / Help has an independent AI Lesson Context tab with downloadable `lesson-ai-context.md`.
 
 ## Tech Stack
 
@@ -42,7 +50,7 @@ _Add an optional screenshot here, for example `docs/screenshot.png`._
 
 No backend, database, package manager, CDN, external dependency, build step, React, Next.js, Vite, or server framework is required. No build step is required. Direct `index.html` opening is supported where the browser permits local file APIs; a local HTTP server is recommended for testing and required for mobile LAN access.
 
-## Offline and Data Storage Behavior
+## Local-First Data Storage
 
 CQStudio stores app data in the current browser profile using `localStorage`:
 
@@ -52,7 +60,7 @@ CQStudio stores app data in the current browser profile using `localStorage`:
 
 Important behavior and limitations:
 
-- Data stays on the same browser/device only unless exported and imported manually.
+- Data stays in the current browser profile/device only unless exported and imported manually. Hosting does not create cloud sync.
 - Use **Guide / Help → Data / Backup → Export Data** to download a readable `cqstudio-backup-YYYY-MM-DD.json` file.
 - Import validates a CQStudio backup and replaces current app data only after confirmation. Merge import is not implemented.
 - Reset All Data clears app data from `offlineClassQuizStudio.v1` after strong confirmation and keeps the theme preference. Export a backup before clearing browser storage or moving devices.
@@ -63,9 +71,9 @@ Important behavior and limitations:
 
 ## Run Locally
 
-### Local offline use
+### Local use and hosting
 
-Open `index.html` directly, or start `python -m http.server 8000` and open `http://localhost:8000`. No internet connection is needed.
+Open `index.html` directly where supported, or serve locally with `python -m http.server 8000`. CQStudio may also be hosted as a static website such as Vercel. A hosted page may need internet for initial loading; there is no backend or cloud synchronization.
 
 ### Local server
 
@@ -173,7 +181,7 @@ Recommended manual checks before sharing or deploying:
 4. Upload `sample-biology-quiz.md`, preview it, and save it.
 5. Create/edit a manual quiz.
 6. Preview a saved quiz from the quiz tab.
-7. Take a quiz with shuffled, paged, one-question, whole-timer, and per-question timer settings.
+7. Configure shuffle, display, pagination, and timer defaults in Quiz Builder, then take a quiz and verify those saved settings.
 8. Export data and confirm the JSON contains `dataVersion`, `state.version`, and `state.classes`.
 9. Confirm invalid import JSON is rejected and valid backup import asks for confirmation before replacing data.
 10. Confirm Reset All Data asks for confirmation, clears app data, and keeps the theme.
@@ -223,7 +231,7 @@ The initial module refactor was deferred after breaking startup; its unused file
 
 ## Developer Notes
 
-- Preserve offline behavior and static deployment compatibility.
+- Preserve local-first browser behavior and static deployment compatibility; hosting does not add cloud sync.
 - Avoid external CDNs, dependencies, package installs, and build-only workflows.
 - Preserve `localStorage` compatibility where practical.
 - Keep user-generated text escaped before inserting into HTML.

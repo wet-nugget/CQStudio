@@ -42,9 +42,30 @@
             <div class="actions"><button id="editClassBtn" class="secondary-btn">Edit</button><button id="deleteClassBtn" class="danger-btn">Delete</button></div>
           </div>
 
-          <div class="two-column">
-            <section class="panel">
-              <h3>Add material / note</h3>
+          <div class="class-detail-tabs" role="tablist" aria-label="Class study sections">
+            <button id="classLessonsTab" class="tab active" type="button" data-class-section="lessons" role="tab" aria-selected="true" aria-controls="classLessonsPanel">Lessons</button>
+            <button id="classMaterialsTab" class="tab" type="button" data-class-section="materials" role="tab" aria-selected="false" aria-controls="classMaterialsPanel">Materials / Notes</button>
+            <button id="classQuizzesTab" class="tab" type="button" data-class-section="quizzes" role="tab" aria-selected="false" aria-controls="classQuizzesPanel">Quizzes</button>
+          </div>
+          <div class="class-section-panels">
+            <section id="classLessonsPanel" class="panel lesson-panel class-section-panel active" role="tabpanel" aria-labelledby="classLessonsTab">
+              <div class="section-heading compact-heading"><div><h3>Lesson Reviewer</h3><p class="muted">Import Markdown lessons, review them, and track your progress.</p></div></div>
+              <div id="lessonProgressSummary" class="lesson-progress-summary" aria-live="polite"></div>
+              <form id="lessonForm" class="stack">
+                <input id="lessonId" type="hidden" />
+                <label>Lesson title<input id="lessonTitle" required placeholder="Chapter 1: Introduction" /></label>
+                <label>Markdown lesson file<input id="lessonFile" type="file" accept=".md,.markdown,text/markdown,text/plain" /></label>
+                <label>Markdown content<textarea id="lessonMarkdown" rows="8" placeholder="# Lesson heading&#10;Paste lesson Markdown here..."></textarea></label>
+                <div class="actions"><button id="previewLessonBtn" class="secondary-btn" type="button">Preview lesson</button><button class="primary-btn" type="submit">Save lesson</button><button id="cancelLessonEditBtn" class="ghost-btn hidden" type="button">Cancel edit</button></div>
+                <div id="lessonStatus" class="form-message" role="status" aria-live="polite"></div>
+              </form>
+              <div id="lessonPreview" class="lesson-content hidden" aria-label="Lesson preview"></div>
+              <div id="lessonList" class="list"></div>
+              <article id="lessonReader" class="lesson-content hidden"></article>
+            </section>
+            <section id="classMaterialsPanel" class="panel class-section-panel" role="tabpanel" aria-labelledby="classMaterialsTab" hidden>
+              <h3>Materials / Notes</h3>
+              <p class="muted">Quick notes, links, attachments, and reference files. For structured Markdown lessons and progress tracking, use Lessons.</p>
               <form id="materialForm" class="stack">
                 <input id="materialTitle" required placeholder="Lecture notes week 1" />
                 <textarea id="materialBody" rows="6" placeholder="Paste notes, links, reminders, or reading tasks..."></textarea>
@@ -58,7 +79,7 @@
               <div id="materialsList" class="list"></div>
             </section>
 
-            <section class="panel">
+            <section id="classQuizzesPanel" class="panel class-section-panel" role="tabpanel" aria-labelledby="classQuizzesTab" hidden>
               <div class="section-heading compact-heading">
                 <div><h3>Quizzes</h3><p class="muted">Upload Markdown or create a quiz manually.</p></div>
                 <button id="createQuizBtn" class="primary-btn" type="button">Create Quiz</button>
@@ -68,7 +89,7 @@
               <div id="quizPreview" class="preview hidden"></div>
               <button id="saveQuizBtn" class="primary-btn hidden">Save generated quiz</button>
               <h3>Saved quizzes</h3>
-              <div id="quizzesList" class="list"></div>
+              <div id="quizzesList" class="list quiz-card-list quiz-list-scroll" tabindex="0" role="region" aria-label="Saved class quizzes"></div>
             </section>
           </div>
         </div>
@@ -160,6 +181,7 @@
         <button class="tab active" type="button" data-help-tab="quick" role="tab" aria-selected="true" aria-controls="helpMarkdownPreview">Quick Guide</button>
         <button class="tab" type="button" data-help-tab="sample" role="tab" aria-selected="false" aria-controls="helpMarkdownPreview">Sample Data</button>
         <button class="tab" type="button" data-help-tab="ai" role="tab" aria-selected="false" aria-controls="helpMarkdownPreview">AI Quiz Context</button>
+        <button class="tab" type="button" data-help-tab="lesson" role="tab" aria-selected="false" aria-controls="helpMarkdownPreview">AI Lesson Context</button>
         <button class="tab" type="button" data-help-tab="data" role="tab" aria-selected="false" aria-controls="helpMarkdownPreview">Data / Backup</button>
       </div>
       <div id="helpTabActions" class="actions help-actions"></div>
@@ -187,9 +209,22 @@
         <input type="hidden" id="builderQuizId" />
         <div class="form-grid">
           <label>Quiz title<input id="builderTitleInput" required placeholder="Cell Biology Review" /></label>
-          <label>Time limit<input id="builderTime" type="number" min="1" value="10" /></label>
+          <input id="builderTime" type="hidden" value="0" />
           <label>Points<input id="builderPoints" type="number" min="1" value="10" /></label>
         </div>
+        <fieldset class="setup-fieldset builder-attempt-settings">
+          <legend>Quiz Attempt Settings</legend>
+          <p class="muted small-text">These defaults are used every time this saved quiz starts. Shuffle changes only the attempt order.</p>
+          <label class="inline-check"><input id="builderShuffle" type="checkbox" /> Shuffle questions by default</label>
+          <label>Display mode<select id="builderDisplayMode"><option value="paged">Multiple questions per page</option><option value="one">One question at a time</option></select></label>
+          <label id="builderPerPageWrap">Questions per page<input id="builderPerPage" type="number" min="1" max="20" value="5" /></label>
+          <label class="inline-check"><input id="builderWholeTimer" type="checkbox" /> Use whole-quiz timer</label>
+          <label id="builderWholeMinutesWrap">Time limit (minutes)<input id="builderWholeMinutes" type="number" min="1" max="600" value="10" /></label>
+          <div id="builderQuestionTimerSettings" class="stack hidden">
+            <label class="inline-check"><input id="builderQuestionTimer" type="checkbox" /> Use per-question timer</label>
+            <label>Seconds per question<input id="builderQuestionSeconds" type="number" min="10" max="3600" value="60" /></label>
+          </div>
+        </fieldset>
         <hr />
         <div class="builder-workspace">
           <aside class="builder-sidebar" aria-label="Quiz questions">
@@ -225,46 +260,9 @@
     </div>
   </div>
 
-  <div id="quizSetupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="quizSetupTitle">
-    <div class="modal-card quiz-setup-card">
-      <button class="modal-close ghost-btn" data-close="quizSetupModal" aria-label="Close quiz setup">✕</button>
-      <p class="eyebrow">Attempt Setup</p>
-      <h2 id="quizSetupTitle">Start Quiz</h2>
-      <form id="quizSetupForm" class="stack">
-        <input type="hidden" id="quizSetupId" />
-        <p id="quizSetupSummary" class="muted"></p>
-        <fieldset class="setup-fieldset">
-          <legend>Question order</legend>
-          <label class="inline-check"><input id="setupShuffle" type="checkbox" /> Shuffle questions for this attempt</label>
-          <p class="muted small-text">Shuffle never changes the saved quiz. Preview and edit keep the original order.</p>
-          <button id="setupResetOrder" class="ghost-btn" type="button">Use original order</button>
-        </fieldset>
-        <fieldset class="setup-fieldset">
-          <legend>Display mode</legend>
-          <label class="inline-check"><input type="radio" name="setupDisplayMode" value="paged" checked /> Multiple questions at once</label>
-          <label>Questions per page<input id="setupQuestionsPerPage" type="number" min="1" max="20" value="5" /></label>
-          <label class="inline-check"><input type="radio" name="setupDisplayMode" value="one" /> One question at a time</label>
-        </fieldset>
-        <fieldset class="setup-fieldset">
-          <legend>Whole-quiz timer</legend>
-          <label class="inline-check"><input id="setupWholeTimer" type="checkbox" /> Use whole-quiz timer</label>
-          <label>Minutes<input id="setupWholeMinutes" type="number" min="1" max="600" value="10" /></label>
-          <p class="muted small-text">When time expires, the app automatically submits the attempt.</p>
-        </fieldset>
-        <fieldset id="perQuestionSetup" class="setup-fieldset hidden">
-          <legend>Per-question timer</legend>
-          <label class="inline-check"><input id="setupQuestionTimer" type="checkbox" /> Use per-question timer</label>
-          <label>Seconds per question<input id="setupQuestionSeconds" type="number" min="10" max="3600" value="60" /></label>
-          <p class="muted small-text">Available in one-question mode. This pass uses one default time for every question; it follows the question even when shuffled.</p>
-        </fieldset>
-        <div class="actions class-modal-actions"><button class="primary-btn" type="submit">Start quiz</button><button class="ghost-btn" type="button" data-close="quizSetupModal">Cancel</button></div>
-      </form>
-    </div>
-  </div>
-
   <div id="quizOverlay" class="modal hidden quiz-modal" role="dialog" aria-modal="true" aria-labelledby="activeQuizTitle">
     <div class="modal-card quiz-overlay-card">
-      <button id="closeQuizOverlayBtn" class="modal-close ghost-btn" type="button" aria-label="Close quiz">✕</button>
+      <div class="quiz-floating-actions"><button id="closeQuizOverlayBtn" class="ghost-btn" type="button" aria-label="Close quiz">✕</button><button id="topSubmitQuiz" class="primary-btn hidden" type="button" aria-label="Submit quiz">Submit quiz</button></div>
       <div id="quizOverlayContent"></div>
     </div>
   </div>

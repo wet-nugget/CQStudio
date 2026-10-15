@@ -4,13 +4,15 @@
 
 ### What the app does
 
-Offline Class & Quiz Studio / CQStudio is a browser-only study management app. It lets users manage classes through a focused overlay, customize class icons, add notes/materials, upload Markdown quiz files, preview generated quizzes, take quizzes, and view results.
+Offline Class & Quiz Studio / CQStudio is a browser-based, local-first study management app. It lets users manage classes through a focused overlay, customize class icons, add lessons and materials, import Markdown quizzes, preview and take quizzes, and view results.
 
-The app works offline when served locally or from static hosting. It uses one classic script (`app.js`), so opening `index.html` directly is supported where the browser permits local file APIs. A local HTTP server is recommended for testing; `python -m http.server 8000` continues until stopped with `Ctrl+C`. Data is stored locally in browser `localStorage`.
+Class Detail uses Lessons, Materials / Notes, and Quizzes sub-tabs. The quiz overlay provides floating progress/timer/submit controls and bounded lists. Help includes separate AI Quiz Context and AI Lesson Context documents.
+
+CQStudio can be opened locally or hosted as a static website, including on Vercel. It uses one classic script (`app.js`) with no backend or account. Hosted pages may need internet for initial loading; quizzes and lessons process in-browser. App data is stored in each browser profile's `localStorage` and is not synchronized across devices. Use Data / Backup Export and Import to transfer data. For local HTTP testing, `python -m http.server 8000` runs until stopped with `Ctrl+C`.
 
 ### Who it is for
 
-- Students who want a simple offline study organizer
+- Students who want a simple local-first study organizer
 - Teachers or tutors who want to prepare local class materials and quizzes
 - Developers or AI assistants maintaining a small vanilla HTML/CSS/JS app
 
@@ -18,8 +20,11 @@ The app works offline when served locally or from static hosting. It uses one cl
 
 - Create, edit, and delete classes from a focused overlay
 - Customize class icons with tabbed Presets, Hex, and RGB color controls, styles, shapes, emoji, or small image uploads
-- Add typed notes/materials to a class
+- Add typed notes/materials and Markdown lessons to a class
 - Attach local material files to a class
+- Import, preview, and edit Markdown lessons, with per-lesson completion, confidence, and reflection tracking
+- Use distinct Class Detail sub-tabs for Lessons, Materials / Notes, and Quizzes
+- Read/download the independent AI Lesson Context Markdown from Guide / Help
 - Upload `.md` quiz files using the supported custom Markdown quiz format
 - Preview parsed quizzes before saving
 - Save generated quizzes to a class
@@ -43,7 +48,7 @@ The app works offline when served locally or from static hosting. It uses one cl
 - HTML: `index.html`
 - CSS: `styles.css`
 - JavaScript: `app.js` (single classic script; incomplete `js/` module experiment is not loaded)
-- Markdown sample quiz: `sample-biology-quiz.md`
+- Markdown quiz and lesson samples are generated from `app.js` and downloadable from Guide / Help → Sample Data.
 
 ### Frameworks and libraries
 
@@ -95,7 +100,7 @@ CQStudio/
 
 - `index.html`
   - Defines the app shell and UI sections.
-  - Contains dashboard, class detail, material upload, quiz upload, quiz preview, quiz-taking, and result containers.
+  - Contains dashboard, class detail with Lessons / Materials / Notes / Quizzes sub-tabs, material upload, quiz upload, quiz preview, quiz-taking, and result containers.
   - Loads `styles.css` and the classic `app.js` script.
 
 - `styles.css`
@@ -117,7 +122,7 @@ CQStudio/
 
 ### High-level architecture
 
-This is a single-page offline app with three main UI views:
+This is a single-page, local-first browser app with three main UI views:
 
 1. Dashboard
 2. Class detail
@@ -151,8 +156,14 @@ There is no backend, API server, database, routing library, or build system.
   - `renderClassDetail()`
   - `renderMaterial()`
   - `renderQuizPreview()`
-  - `buildQuizForm()`
-  - `questionInput()`
+  - `quizPreviewHtml()` uses a bounded, keyboard-focusable question-list region for long previews.
+  - `renderAttemptPage()` provides one floating submit control grouped with close, plus timer, progress, and pagination controls; the shared `submitActiveQuiz()` handles confirmation and timer expiry.
+  - Guide / Help Sample Data has keyboard-accessible Quiz Sample and Lesson Sample tabs, a Markdown preview, and a download action for the selected sample.
+  - `sampleClass()` includes an example lesson, material, and quiz; loading sample data replaces current data only after confirmation.
+
+- Help documents
+  - `helpDoc(tab)` explicitly maps `quick` → Quick Guide, `sample` → Sample Data, `ai` → AI Quiz Context, `lesson` → AI Lesson Context, and `data` → Data / Backup; only invalid keys fall back to Quick Guide.
+  - `lessonAiContextMarkdown()` documents only the renderer-supported safe subset. Lesson rendering escapes user text before creating formatted elements.
 
 - Quiz parsing
   - `parseQuizMarkdown(md)`
@@ -196,6 +207,8 @@ There is no backend, API server, database, routing library, or build system.
 4. `saveState()` persists data to `localStorage` under `offlineClassQuizStudio.v1`.
 
 ### State management
+
+The Help tab keys are independent of app navigation. Class Detail sub-tab selection is UI state only and does not modify stored class/lesson/material/quiz data. Quiz previews share a bounded question scroll region; attempt submit controls are two entry points to one guarded handler, with confirmation for manual submission and automatic submit on timer expiry.
 
 State is stored in a single JavaScript object with a schema version:
 
@@ -241,7 +254,7 @@ Open this file in a browser:
 C:\Users\tamlc\Desktop\Pi Dev\CQStudio\index.html
 ```
 
-The app should work offline without an internet connection.
+The app is local-first: opened locally, quiz and lesson processing and data storage work in-browser without a backend; a hosted static site may require internet for initial loading. There is no cloud synchronization.
 
 ### Environment variables
 
@@ -373,9 +386,9 @@ None.
 - `FileReader`
   - Reads uploaded quiz files and small text/Markdown material files.
 - `Blob`
-  - Creates downloadable sample quiz content.
+  - Creates downloadable sample quiz and lesson Markdown content.
 - `URL.createObjectURL`
-  - Generates temporary download URL for the sample Markdown quiz.
+  - Generates temporary download URLs for sample Markdown files.
 - `confirm`
   - Confirms destructive/replace actions.
 - `window.matchMedia`
@@ -569,7 +582,7 @@ The earlier module refactor was deferred after breaking startup; its unused file
 - Keep UI rendering in explicit render functions.
 - Call `render()` after changing `state` so UI and `localStorage` stay in sync.
 - Use `escapeHtml()` before inserting user-controlled text into HTML strings.
-- Preserve offline behavior; do not add external CDNs or network dependencies.
+- Preserve local-first browser behavior and static hosting support; do not add external CDNs, backend services, or network dependencies.
 
 ### Common pitfalls
 
@@ -688,16 +701,17 @@ Current CQStudio behavior now includes these data-safety refinements:
 - `resetAllData()` asks for two confirmations, clears app data from `offlineClassQuizStudio.v1`, resets in-memory state to `{ version: 1, classes: [] }`, refreshes the UI, and keeps `offlineClassQuizStudio.theme`.
 - The downloadable quick guide and data backup guide document export/import/reset behavior.
 
-## Recent Behavior Update: Quiz Attempt Setup, Timers, and Color Tabs
+## Current Behavior: Builder Attempt Settings, Timers, and Color Tabs
 
 Current CQStudio behavior now includes these refinements:
 
 - Class icon color controls are separated into accessible tabs: `Presets`, `Hex`, and `RGB`.
 - The shared color state is synchronized by `syncColorControls(color, source)` so presets, color input, hex input, RGB sliders/numbers, and the live icon preview stay aligned.
 - `setColorMode(mode)` controls the visible color panel and updates `aria-selected` on `[data-color-mode]` tabs.
-- Clicking `Take quiz` opens `#quizSetupModal` instead of immediately opening the quiz overlay.
-- Quiz setup supports attempt-only shuffle, a reset/original-order button, paginated mode with `#setupQuestionsPerPage`, one-question mode, optional whole-quiz timer, and optional default per-question timer for one-question mode.
-- Shuffle is implemented with cloned attempt questions from `prepareAttemptQuestions(quiz, shuffle)` so saved quiz order is not changed; preview and edit remain in saved/original order.
+- Quiz Attempt Settings are configured and saved in the Quiz Builder; sanitized legacy quizzes receive safe defaults.
+- Clicking `Take quiz` displays a start/cancel confirmation only; the separate full setup modal is not used.
+- Settings include shuffle, paginated or one-question mode, page size, whole-quiz timer, and default per-question timer for one-question mode.
+- Shuffle clones the question list for the current attempt via `prepareAttemptQuestions(quiz, shuffle)` and never changes saved question order; preview and edit remain in saved order.
 - `activeQuiz` now tracks attempt config, cloned question order, page index, answer cache, timer deadlines, and submitted state.
 - Answers are cached by question id in `activeQuiz.answers` via `collectAttemptAnswers()` before navigation and submission.
 - `renderAttemptPage()` renders only the active page/question and restores cached answers.

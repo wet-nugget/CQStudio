@@ -2,17 +2,23 @@
 
 ## Overview
 
-Offline Class & Quiz Studio / CQStudio is a local, offline browser app for managing classes, materials, and quizzes. It uses `index.html`, `styles.css`, and a single classic JavaScript file (`app.js`); there is no backend, database, account system, CDN, or external dependency. You can open `index.html` directly or optionally serve the folder with `python -m http.server 8000` at `http://localhost:8000`. The server continues running until stopped with `Ctrl+C`. A local server is recommended for testing. No internet connection is needed.
+Offline Class & Quiz Studio / CQStudio is a browser-based, local-first study app for classes, materials, lessons, and quizzes. It uses `index.html`, `styles.css`, and a single classic JavaScript file (`app.js`). Open it locally or host it as a static website, including on Vercel. No backend, database, account, or external dependency is required. A hosted site may need internet for initial loading; local browser processing and localStorage data work without a server after the page is loaded.
 
 ## Main Workflow
 
 1. Use **Create Class** on the Dashboard to open the focused class overlay.
 2. Add a class name, teacher/subject, description, and optional custom icon.
-3. Open a class to add materials, upload Markdown quizzes, or create quizzes manually.
+3. Open a class. Class Detail is organized into **Lessons**, **Materials / Notes**, and **Quizzes** sub-tabs; switch to the relevant area instead of scrolling through all resource forms at once.
 4. Preview saved quizzes without starting an attempt.
-5. Choose quiz attempt settings, then start the focused quiz overlay.
+5. Configure defaults in the Quiz Builder's **Quiz Attempt Settings**, then use **Take quiz** to confirm start.
 6. Submit the quiz or let an enabled timer submit automatically.
-7. Use **Guide / Help** for downloadable Quick Guide, Sample Data, AI Quiz Context, and Data / Backup tools.
+7. Use **Guide / Help** for Quick Guide, Sample Data, AI Quiz Context, AI Lesson Context, and Data / Backup.
+
+## Lesson Reviewer and Progress
+
+Open a class and choose **Lessons**. Lessons are structured Markdown study content with status, confidence, and reflection tracking; import a `.md` / `.markdown` file or paste/edit content, preview it, then save. Open a saved lesson to update its progress and reflection. **Materials / Notes** is for quick notes, links, attachments, and references without lesson progress. **Quizzes** contains uploaded or manually created assessments, with preview/edit/take actions.
+
+The lesson renderer formats headings (`#` through `######`), paragraphs, **bold**, *italic*, inline code, simple bulleted and numbered lists, blockquotes, and fenced code blocks. Tables, links, images, nested lists, raw HTML, and advanced Markdown syntax are not supported. Raw HTML is escaped and displayed as text. Lesson status, confidence, and reflection are stored with that class and included in JSON backups.
 
 ## Class Overlay and Icon Colors
 
@@ -28,42 +34,27 @@ All color modes stay synchronized. Switching tabs preserves the current color, a
 
 Other icon controls are preserved: style, shape, emoji, uploaded image, and reset. Uploaded image icons must be image files under 200 KB and are stored locally as Data URLs.
 
-## Quiz Start Setup
+## Quiz Attempt Settings
 
-Clicking **Take quiz** opens a setup modal before the quiz overlay. Configure:
+Configure saved defaults in the Quiz Builder's **Quiz Attempt Settings**. Options include original/shuffled question order, multiple questions per page or one question at a time, questions per page, optional whole-quiz time limit, and optional default per-question timer (one-question mode). Existing quizzes receive safe defaults when loaded. Clicking **Take quiz** shows a simple start/cancel confirmation, not a second settings form. Shuffle operates on a cloned attempt and never mutates saved question order. Timer expiry submits automatically for whole-quiz timers; per-question expiry advances or submits on the final question. Answers are preserved while navigating. Completed attempts are added to that quiz's local history; cards retain the latest score and show attempt count. Open History to review dates, scores, settings, and duration, or clear history with confirmation.
 
-- **Shuffle questions** — applies only to the current attempt and never changes the saved quiz.
-- **Use original order** — clears shuffle before starting.
-- **Display mode**:
-  - **Multiple questions at once** with a questions-per-page setting.
-  - **One question at a time** with Previous / Next navigation and progress text.
-- **Whole-quiz timer**:
-  - No timer, or custom minutes.
-  - When time expires, the attempt submits automatically.
-- **Per-question timer**:
-  - Available only in one-question mode.
-  - This version supports one default number of seconds for every question.
-  - When a question timer expires, the app moves to the next question or submits on the last question.
-  - The timer follows the displayed question even when shuffle is enabled.
-
-Answers are preserved when moving between pages/questions. Completed attempts are added to that quiz's local history; cards retain the latest score and show attempt count. Open History to review dates, scores, settings, and duration, or clear history with confirmation.
-
-Completed results include **Print Results** and **Download Results as Markdown**. The report includes the class, score, attempt settings, and per-question submitted/correct answers.
+A single floating **Submit quiz** button is grouped with the close control and remains accessible while scrolling; Previous / Next navigation contains no Submit button. The shared submit handler confirms once, guards against duplicate submission, and timer expiry submits automatically. Long imported and saved quiz previews keep all questions in a keyboard-focusable bounded scrollbox; scroll it to review questions while the title/actions remain accessible outside. The report includes the class, score, attempt settings, and per-question submitted/correct answers.
 
 The manual builder autosaves locally after a short debounce. If you reopen a builder while a draft exists, choose to restore it or start fresh. Use Restore draft / Discard draft controls in the builder; saving a quiz removes the draft. Closing with unsaved work warns that the draft remains available.
 
 ## Guide / Help Modal
 
-The Guide / Help modal has four independent tabs:
+The Guide / Help modal has five independent tabs:
 
 - **Quick Guide** — compact usage notes.
-- **Sample Data** — sample-data preview, sample-data loader, and sample quiz download.
-- **AI Quiz Context** — downloadable `quiz-ai-context.md` for AI assistants.
+- **Sample Data** — switch between quiz and lesson Markdown samples, preview either, and download the selected `.md` file. Loading sample data replaces current app data after confirmation and now includes a sample lesson alongside sample classes, materials, and quizzes. To import only the lesson elsewhere, download Lesson Sample and use the class's Lessons tab.
+- **AI Quiz Context** — downloadable `quiz-ai-context.md` for AI assistants creating supported quiz files.
+- **AI Lesson Context** — downloadable `lesson-ai-context.md`, an authoring guide that explains the lesson renderer's safe Markdown subset and provides a complete example. Use it as context when asking another AI to draft importable lessons; the AI must not add unsupported Markdown or invent CQStudio behavior.
 - **Data / Backup** — export/import/reset controls and a downloadable data backup guide.
 
 ## Data / Backup
 
-CQStudio stores data locally in this browser under `offlineClassQuizStudio.v1`. Deployed copies of the app do not sync data between devices or users.
+CQStudio stores data in this browser's `localStorage` under `offlineClassQuizStudio.v1`. It can run locally or as a static hosted website, including Vercel; hosting does not provide cloud sync. Data is separate per browser, device, and profile. Quiz and lesson processing occurs in-browser. Use Export Data / Import Data to move data between devices.
 
 Use **Export Data** to download a readable JSON backup named like `cqstudio-backup-YYYY-MM-DD.json`. The backup includes version metadata, classes, materials, quizzes, latest quiz scores, and class icon settings.
 
@@ -193,7 +184,7 @@ Answers:
 
 ## Developer Notes
 
-- Keep the app offline and dependency-free.
+- Keep the app browser-local-first and dependency-free; a hosted static copy may require internet to initially load.
 - Preserve localStorage compatibility under `offlineClassQuizStudio.v1`.
 - Keep export/import/reset safeguards working before major refactors.
 - Update migration/sanitization helpers when changing the saved data shape.

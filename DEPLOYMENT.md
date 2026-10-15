@@ -1,6 +1,6 @@
 # CQStudio Deployment Guide
 
-CQStudio is a static, browser-only study app. It uses root-level `index.html`, `styles.css`, and a single classic `app.js`; no backend, npm dependencies, build step, or runtime internet access is required. Deployment provides a URL but does not provide cloud storage or cross-device syncing. The archived failed module experiment is not used; exclude `archive/failed-module-refactor/` from deployment if desired.
+CQStudio is a browser-based, local-first study app. It uses root-level `index.html`, `styles.css`, and a single classic `app.js`; no backend, npm dependencies, or build step is required. It can be opened locally or hosted as a static website, including on Vercel. A hosted copy may need internet for initial loading; deployment does not provide cloud storage or cross-device syncing. Quiz and lesson processing and saved data stay in the browser. The archived failed module experiment is not used; exclude `archive/failed-module-refactor/` from deployment if desired.
 
 ## Pre-Deployment Checklist
 
@@ -14,7 +14,7 @@ CQStudio is a static, browser-only study app. It uses root-level `index.html`, `
 
 - [ ] Upload and save `sample-biology-quiz.md`.
 - [ ] Preview a saved quiz without starting an attempt.
-- [ ] Take a quiz with the desired setup options.
+- [ ] Configure Quiz Attempt Settings in the builder, then start and test the saved defaults.
 - [ ] Test Guide / Help downloads.
 - [ ] Export Data and confirm the backup JSON contains version metadata and classes.
 - [ ] Import an exported backup and confirm the replace warning appears.
