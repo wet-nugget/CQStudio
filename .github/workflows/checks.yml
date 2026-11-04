@@ -1,0 +1,39 @@
+name: Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm run setup:doctor
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npx tsc --project supabase/functions/tsconfig.json
+      - run: npm test
+      - run: npm audit --audit-level=high
+      - run: node scripts/check-secrets.mjs
+      - name: Prepare headers for the isolated CI build
+        run: npm run headers
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:smoke
+  rls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+      - run: supabase start -x studio,imgproxy,logflare,vector,supavisor
+      - run: supabase db reset --no-seed
+      - run: supabase db lint --level error
+      - run: supabase test db
+      - if: always()
+        run: supabase stop --no-backup

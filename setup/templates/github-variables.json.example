@@ -1,0 +1,6 @@
+{
+  "CQ_PROD_APP_ORIGIN": "https://YOUR_APP.vercel.app",
+  "CQ_PROD_RUNNER_ORIGIN": "https://YOUR_RUNNER.vercel.app",
+  "CQ_PROD_SUPABASE_URL": "https://YOUR_PROJECT.supabase.co",
+  "CQ_PROD_SUPABASE_ANON_KEY": "YOUR_PUBLISHABLE_OR_ANON_KEY"
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="cq-app-origin" content="__APP_ORIGIN__"><title>CQStudio isolated quiz</title><style>html,body{height:100%;margin:0;background:#fff;color:#203428;font:14px system-ui}iframe{border:0;width:100%;height:100%;display:block}#status{padding:20px}</style></head><body><p id="status" role="status">Waiting for your quiz…</p><script>
+(()=>{
+  'use strict';
+  const appOrigin=document.querySelector('meta[name="cq-app-origin"]').content;
+  let frame=null,channel='',objectUrl='',forwarded=false;
+  const finite=value=>typeof value==='number'&&Number.isFinite(value);
+  window.addEventListener('message',event=>{
+    const data=event.data;
+    if(event.source===parent&&event.origin===appOrigin){
+      if(!data||data.type!=='cq-load'||typeof data.channel!=='string'||!/^[a-zA-Z0-9-]{32,80}$/.test(data.channel)||typeof data.html!=='string'||new TextEncoder().encode(data.html).length>52428800)return;
+      if(frame)frame.remove();if(objectUrl)URL.revokeObjectURL(objectUrl);
+      channel=data.channel;forwarded=false;
+      frame=document.createElement('iframe');frame.title='Isolated HTML practice quiz';frame.setAttribute('sandbox','allow-scripts');frame.referrerPolicy='no-referrer';
+      objectUrl=URL.createObjectURL(new Blob([data.html],{type:'text/html;charset=utf-8'}));frame.src=objectUrl;
+      document.getElementById('status').hidden=true;document.body.append(frame);
+      return;
+    }
+    if(!frame||event.source!==frame.contentWindow||forwarded||!data||Object.keys(data).sort().join(',')!=='max,score,type'||data.type!=='cq-result'||!finite(data.score)||!finite(data.max)||data.max<=0||data.max>1000000||data.score<0||data.score>data.max)return;
+    forwarded=true;parent.postMessage({type:'cq-result',channel,score:data.score,max:data.max},appOrigin);
+  });
+  parent.postMessage({type:'cq-ready'},appOrigin);
+})();
+</script></body></html>

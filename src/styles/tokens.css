@@ -1,0 +1,73 @@
+/* Ink & Violet. All component colors resolve through these semantic roles. */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#0F1623; --surface:#161D2B; --surface-2:#1D2636; --sunken:#0B111B;
+  --border:#263044; --border-strong:#34405A;
+  --text:#E8EDF7; --text-muted:#9AA6B8;
+  --primary:#7C3AED; --primary-hover:#6D28D9; --on-primary:#FFFFFF;
+  --primary-text:#A78BFA; --primary-subtle:#2A2159; --on-primary-subtle:#A78BFA;
+  --secondary:#167089; --secondary-hover:#125C72; --on-secondary:#FFFFFF;
+  --accent:#FBBF24; --accent-bg:#3A2A06; --on-accent-bg:#FDE68A;
+  --success:#34D399; --danger:#F87171; --info:#60A5FA;
+  --focus:#A78BFA;
+  --shadow:0 4px 16px rgba(0,0,0,.45);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:#F5F6FA; --surface:#FFFFFF; --surface-2:#EEF0F7; --sunken:#E7EAF3;
+  --border:#DCE0EC; --border-strong:#C3C9DA;
+  --text:#151B2B; --text-muted:#4D586D;
+  --primary:#7C3AED; --primary-hover:#6D28D9; --on-primary:#FFFFFF;
+  --primary-text:#6D28D9; --primary-subtle:#EDE9FE; --on-primary-subtle:#5B21B6;
+  --secondary:#167089; --secondary-hover:#125C72; --on-secondary:#FFFFFF;
+  --accent:#A34908; --accent-bg:#FEF3C7; --on-accent-bg:#78350F;
+  --success:#137333; --danger:#B91C1C; --info:#1D4ED8;
+  --focus:#6D28D9;
+  --shadow:0 4px 16px rgba(21,27,43,.12);
+}
+:root {
+  --ink:var(--text); --muted:var(--text-muted); --line:var(--border);
+  --soft:var(--surface-2); --forest:var(--primary-text); --sage:var(--primary-subtle);
+  --peach:var(--accent-bg); --lilac:var(--primary-subtle);
+  --font-sans:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --text-xs:12px; --text-sm:13px; --text-base:15px;
+  --text-lg:18px; --text-xl:22px; --text-2xl:28px; --text-display:40px;
+  --radius-card:16px; --radius-control:10px; --radius-pill:9999px;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+  --space-6:24px; --space-8:32px;
+  --content-max:1440px; --reading-max:70ch;
+  --control-height:36px; --table-row-height:40px;
+  --motion-duration:150ms;
+}
+:root[data-density="comfortable"] { --control-height:44px; --table-row-height:52px; }
+@media(pointer:coarse) {
+  :root { --control-height:44px; --table-row-height:52px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  :root { --motion-duration:0ms; }
+}
+/* Tailwind CSS-first configuration; this is the breakpoint source of truth. */
+@theme {
+  --breakpoint-sm:480px;
+  --breakpoint-md:768px;
+  --breakpoint-lg:1024px;
+  --breakpoint-xl:1280px;
+  --breakpoint-2xl:1536px;
+}
+@theme inline {
+  --color-bg:var(--bg); --color-surface:var(--surface);
+  --color-surface-2:var(--surface-2); --color-sunken:var(--sunken);
+  --color-border:var(--border); --color-border-strong:var(--border-strong);
+  --color-text:var(--text); --color-text-muted:var(--text-muted);
+  --color-primary:var(--primary); --color-primary-hover:var(--primary-hover);
+  --color-on-primary:var(--on-primary); --color-primary-text:var(--primary-text);
+  --color-primary-subtle:var(--primary-subtle); --color-on-primary-subtle:var(--on-primary-subtle);
+  --color-secondary:var(--secondary); --color-secondary-hover:var(--secondary-hover);
+  --color-on-secondary:var(--on-secondary);
+  --color-accent:var(--accent); --color-accent-bg:var(--accent-bg);
+  --color-on-accent-bg:var(--on-accent-bg);
+  --color-success:var(--success); --color-danger:var(--danger); --color-info:var(--info);
+  --color-focus:var(--focus);
+}

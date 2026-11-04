@@ -1,0 +1,6 @@
+const colors = ['#7C3AED', '#167089', '#B45309', '#15803D', '#BE185D', '#1D4ED8'];
+export function Avatar({ index = 0, size = 36 }: {
+    index?: number;
+    size?: number;
+}) { const n = ((index % 30) + 30) % 30; return <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" className="geometric-avatar"><rect width="48" height="48" rx="24" fill={colors[n % 6]}/>{n % 5 === 0 ? <><circle cx="24" cy="18" r="9" fill="#fff"/><path d="M8 44a16 16 0 0 1 32 0" fill="#fff"/></> : n % 5 === 1 ? <><path d="m24 8 17 29H7Z" fill="#fff"/><circle cx="24" cy="27" r="4" fill={colors[n % 6]}/></> : n % 5 === 2 ? <><rect x="12" y="12" width="24" height="24" rx="6" transform="rotate(45 24 24)" fill="#fff"/><circle cx="24" cy="24" r="5" fill={colors[n % 6]}/></> : n % 5 === 3 ? <><circle cx="19" cy="24" r="12" fill="#fff"/><circle cx="29" cy="24" r="8" fill={colors[n % 6]}/></> : <><path d="M24 7v34M7 24h34M12 12l24 24M12 36l24-24" stroke="#fff" strokeWidth="7"/></>}</svg>; }
+export function BrandMark() { return <svg width="34" height="34" viewBox="0 0 36 36" fill="none" aria-hidden="true"><rect width="36" height="36" rx="10" fill="var(--primary)"/><path d="M18 11c-4-3-8-3-11-2v17c4-1 7 0 11 2 4-2 7-3 11-2V9c-3-1-7-1-11 2Zm0 0v17" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round"/><path d="m23 5 1 3 3 1-3 1-1 3-1-3-3-1 3-1Z" fill="#fff"/></svg>; }

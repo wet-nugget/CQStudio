@@ -1,0 +1,28 @@
+name: Production availability
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-health
+  cancel-in-progress: true
+jobs:
+  health:
+    if: vars.CQ_PROD_APP_ORIGIN != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      VITE_APP_ORIGIN: ${{ vars.CQ_PROD_APP_ORIGIN }}
+      VITE_QUIZ_RUNNER_ORIGIN: ${{ vars.CQ_PROD_RUNNER_ORIGIN }}
+      VITE_SUPABASE_URL: ${{ vars.CQ_PROD_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars.CQ_PROD_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run launch:live

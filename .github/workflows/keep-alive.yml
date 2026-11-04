@@ -1,0 +1,26 @@
+name: Daily database touch
+on:
+  schedule:
+    - cron: '13 2 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  touch:
+    runs-on: ubuntu-latest
+    env:
+      CQ_DEV_SUPABASE_URL: ${{ secrets.CQ_DEV_SUPABASE_URL }}
+      CQ_DEV_MAINTENANCE_TOKEN: ${{ secrets.CQ_DEV_MAINTENANCE_TOKEN }}
+    steps:
+      - name: Touch dev database
+        shell: bash
+        run: |
+          if [ -z "$CQ_DEV_SUPABASE_URL" ] || [ -z "$CQ_DEV_MAINTENANCE_TOKEN" ]; then
+            echo "Configure the dev maintenance URL and token before enabling this workflow."
+            exit 1
+          fi
+          curl --fail --silent --show-error --max-time 30 --retry 2 \
+            --request POST "$CQ_DEV_SUPABASE_URL/functions/v1/maintenance" \
+            --header "Content-Type: application/json" \
+            --header "x-maintenance-token: $CQ_DEV_MAINTENANCE_TOKEN" \
+            --data '{"action":"touch"}'

@@ -1,0 +1,53 @@
+{
+  "name": "cqstudio",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "setup": "node scripts/configure-setup.mjs",
+    "setup:doctor": "node scripts/check-handoff.mjs",
+    "handoff:manifest": "node scripts/handoff-manifest.mjs",
+    "dev": "vite --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "lint": "node scripts/check-source.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "node scripts/check-launch.mjs --if-production && npm run typecheck && node scripts/prepare-headers.mjs --check && vite build && node scripts/check-build.mjs",
+    "launch:check": "node scripts/check-launch.mjs && node scripts/prepare-headers.mjs --check",
+    "launch:live": "node scripts/check-live.mjs",
+    "deploy:prepare": "node scripts/prepare-deployment.mjs",
+    "headers": "node scripts/prepare-headers.mjs",
+    "preview": "vite preview --host 0.0.0.0",
+    "test:smoke": "node scripts/build-smoke.mjs && playwright test",
+    "types:generate": "node scripts/generate-types.mjs",
+    "bootstrap": "node scripts/bootstrap.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
+    "@tanstack/react-query": "5.105.0",
+    "parse5": "8.0.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-hook-form": "7.91.0",
+    "react-markdown": "10.1.0",
+    "react-router-dom": "7.18.5",
+    "rehype-sanitize": "6.0.0",
+    "remark-gfm": "4.0.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.2",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "axe-core": "4.14.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}
