@@ -21,7 +21,7 @@ jobs:
       VITE_APP_ORIGIN: ${{ vars[format('CQ_{0}_APP_ORIGIN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
       VITE_QUIZ_RUNNER_ORIGIN: ${{ vars[format('CQ_{0}_RUNNER_ORIGIN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-node@v4
