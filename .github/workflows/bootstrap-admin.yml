@@ -1,0 +1,49 @@
+name: Invite first administrator
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: bootstrap-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  invite:
+    if: vars.CQ_GITHUB_DEPLOYMENTS_ENABLED == 'true' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets[format('CQ_{0}_SUPABASE_ACCESS_TOKEN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      SUPABASE_PROJECT_REF: ${{ vars[format('CQ_{0}_SUPABASE_PROJECT_REF', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      CQ_BOOTSTRAP_TOKEN: ${{ secrets[format('CQ_{0}_BOOTSTRAP_TOKEN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      FIRST_ADMIN_EMAIL: ${{ secrets[format('CQ_{0}_FIRST_ADMIN_EMAIL', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_SUPABASE_URL: ${{ vars[format('CQ_{0}_SUPABASE_URL', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars[format('CQ_{0}_SUPABASE_ANON_KEY', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_APP_ORIGIN: ${{ vars[format('CQ_{0}_APP_ORIGIN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_QUIZ_RUNNER_ORIGIN: ${{ vars[format('CQ_{0}_RUNNER_ORIGIN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: node scripts/check-cloud.mjs --bootstrap --write-secrets
+      - run: npm run launch:check
+      - name: Confirm both websites and backend are reachable before sending an invite
+        run: npm run launch:live
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+      - name: Temporarily enable the one-time bootstrap secret
+        id: bootstrap-secret
+        run: supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" --env-file "$RUNNER_TEMP/cqstudio-bootstrap.env"
+      - name: Send the first administrator invitation
+        run: node scripts/bootstrap-cloud.mjs
+      - name: Retire the hosted bootstrap secret after any attempt, including partial failure
+        if: always() && steps.bootstrap-secret.outcome != 'skipped' && steps.bootstrap-secret.outcome != ''
+        run: supabase secrets unset BOOTSTRAP_TOKEN --project-ref "$SUPABASE_PROJECT_REF" --yes
+      - name: Remove temporary token file
+        if: always()
+        run: node -e "require('node:fs').rmSync(require('node:path').join(process.env.RUNNER_TEMP, 'cqstudio-bootstrap.env'), {force:true})"

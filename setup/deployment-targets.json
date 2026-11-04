@@ -2,13 +2,61 @@
   "development": {
     "branch": "development",
     "supabaseProject": "cqstudio-dev",
-    "app": { "root": ".", "framework": "vite", "installCommand": "npm ci --ignore-scripts", "buildCommand": "npm run build", "outputDirectory": "dist", "node": "24.x", "variables": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "VITE_APP_ORIGIN", "VITE_QUIZ_RUNNER_ORIGIN"] },
-    "runner": { "root": "runner", "framework": "other", "installCommand": "node -e \"process.exit(0)\"", "buildCommand": "node build.mjs --check", "outputDirectory": "dist", "node": "24.x", "variables": ["APP_ORIGIN"] }
+    "app": {
+      "root": ".",
+      "framework": "other",
+      "installCommand": "npm ci --ignore-scripts",
+      "buildCommand": "npm run build:vercel",
+      "outputDirectory": null,
+      "node": "24.x",
+      "variables": [
+        "VITE_SUPABASE_URL",
+        "VITE_SUPABASE_ANON_KEY",
+        "VITE_APP_ORIGIN",
+        "VITE_QUIZ_RUNNER_ORIGIN"
+      ]
+    },
+    "runner": {
+      "root": "runner",
+      "framework": "other",
+      "installCommand": "node -e \"process.exit(0)\"",
+      "buildCommand": "node build.mjs --vercel",
+      "outputDirectory": null,
+      "node": "24.x",
+      "variables": [
+        "APP_ORIGIN"
+      ]
+    },
+    "deploymentSource": "GitHub repository; no owner checkout required"
   },
   "production": {
     "branch": "main",
     "supabaseProject": "cqstudio-prod",
-    "app": { "root": ".", "framework": "vite", "installCommand": "npm ci --ignore-scripts", "buildCommand": "npm run build", "outputDirectory": "dist", "node": "24.x", "variables": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "VITE_APP_ORIGIN", "VITE_QUIZ_RUNNER_ORIGIN"] },
-    "runner": { "root": "runner", "framework": "other", "installCommand": "node -e \"process.exit(0)\"", "buildCommand": "node build.mjs --check", "outputDirectory": "dist", "node": "24.x", "variables": ["APP_ORIGIN"] }
+    "app": {
+      "root": ".",
+      "framework": "other",
+      "installCommand": "npm ci --ignore-scripts",
+      "buildCommand": "npm run build:vercel",
+      "outputDirectory": null,
+      "node": "24.x",
+      "variables": [
+        "VITE_SUPABASE_URL",
+        "VITE_SUPABASE_ANON_KEY",
+        "VITE_APP_ORIGIN",
+        "VITE_QUIZ_RUNNER_ORIGIN"
+      ]
+    },
+    "runner": {
+      "root": "runner",
+      "framework": "other",
+      "installCommand": "node -e \"process.exit(0)\"",
+      "buildCommand": "node build.mjs --vercel",
+      "outputDirectory": null,
+      "node": "24.x",
+      "variables": [
+        "APP_ORIGIN"
+      ]
+    },
+    "deploymentSource": "GitHub repository; no owner checkout required"
   }
 }

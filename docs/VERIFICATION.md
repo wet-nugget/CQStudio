@@ -1,5 +1,35 @@
 # Local verification record
 
+## GitHub-sourced Vercel + Supabase deployment — 4 November 2026
+
+The owner deployment path now uses only the GitHub/Vercel/Supabase dashboards.
+Vercel builds both projects from Git source and emits Build Output API artifacts
+with validated exact-origin CSP/routing/cache headers generated during the cloud
+build. Neither tracked Vercel config requires local origin substitution.
+
+Added a gated Supabase workflow using reusable app/database checks, branch-selected
+repository credentials, pending migration push/lint and all five function deploys.
+It never resets/seeds production or restores the retired bootstrap token. A separate
+manual first-admin workflow checks live services, temporarily sets the bootstrap
+secret, sends an invitation and attempts cleanup even after partial setting failure.
+Secret selection fails on missing production values rather than falling back to
+development credentials. The source uses repository variables/secrets and does not
+require paid GitHub Environment secret support.
+
+Validation: 59 unit tests across 19 files, app/Edge TypeScript and source checks
+passed; all 33 Chromium checks passed after the header pipeline change. Configured
+app and runner Build Output API artifacts were built and inspected in an isolated
+fixture (fake public configuration and a fixture-only policy, never source/live
+credentials). That configured app's initial JS was approximately 153.7 KiB gzip,
+within the 200 KiB budget. The unconfigured preview can tree-shake more SDK code.
+GitHub workflow validation passed actionlint 1.7.7, YAML parsing and Bash syntax checks.
+
+No authenticated GitHub/Vercel/Supabase access or real cloud deployment was
+performed. The prepared workflows still require actual dashboard configuration,
+provider connectivity, account permissions, SMTP and real-service verification.
+The browser-only walkthrough is `docs/GITHUB-DEPLOYMENT.md`; computer-based
+commands are optional in `docs/LOCAL-DEVELOPMENT.md`.
+
 ## Self-contained GitHub installer handoff — 4 November 2026
 
 Added a single installer entry point (`START-HERE.md`), Node 24 version files,

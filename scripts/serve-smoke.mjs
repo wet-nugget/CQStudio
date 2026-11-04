@@ -5,7 +5,7 @@ import {readFileSync,existsSync} from 'node:fs';
 import {resolve,extname} from 'node:path';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);const appOrigin='http://127.0.0.1:4173',runnerOrigin='https://127.0.0.1:4174';let hits=0;
-const appConfig=JSON.parse(readFileSync('vercel.json','utf8'));const runnerConfig=JSON.parse(readFileSync('/tmp/cqstudio-runner-dist/vercel.smoke.json','utf8'));
+const appConfig=JSON.parse(readFileSync('/tmp/cqstudio-smoke-app.json','utf8'));const runnerConfig=JSON.parse(readFileSync('/tmp/cqstudio-runner-dist/vercel.smoke.json','utf8'));
 const probe=`<script>(async()=>{let score=0;try{top.localStorage.getItem('cq-probe')}catch{score++}try{await fetch('${appOrigin}/__test/honeypot')}catch{score++}try{top.location.href='${appOrigin}/__test/escaped'}catch{score++}parent.parent.postMessage({type:'cq-result',score:999,max:999},'*');parent.postMessage({type:'cq-result',score,max:3},'*');})()<\/script>`;
 const parentScript=`const frame=document.createElement('iframe');frame.title='Quiz runner';frame.sandbox='allow-scripts';const channel=crypto.randomUUID();const send=()=>frame.contentWindow.postMessage({type:'cq-load',channel,html:${JSON.stringify(probe)}},'*');window.addEventListener('message',event=>{if(event.source!==frame.contentWindow)return;if(event.data?.type==='cq-ready')send();if(event.data?.type==='cq-result'&&event.data.channel===channel){document.getElementById('result').textContent=event.data.score+'/'+event.data.max;}});localStorage.setItem('cq-probe','private-app-data');frame.src='${runnerOrigin}';frame.onload=send;document.body.append(frame);`;
 const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.txt':'text/plain'};

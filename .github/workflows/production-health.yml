@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   health:
-    if: vars.CQ_PROD_APP_ORIGIN != ''
+    if: vars.CQ_GITHUB_DEPLOYMENTS_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:

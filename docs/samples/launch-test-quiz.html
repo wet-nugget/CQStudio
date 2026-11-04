@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CQStudio launch test</title>
+  <style>body{font:18px system-ui;padding:24px;color:#111;background:#fff}button{font:inherit;padding:12px;margin:8px}</style>
+</head>
+<body>
+  <h1>What is 2 + 2?</h1>
+  <button type="button" onclick="finish(0)">3</button>
+  <button type="button" onclick="finish(1)">4</button>
+  <p id="result" role="status"></p>
+  <script>
+    let finished = false;
+    function finish(score) {
+      if (finished) return;
+      finished = true;
+      document.getElementById('result').textContent = score ? 'Correct.' : 'Try again next time.';
+      for (const button of document.querySelectorAll('button')) button.disabled = true;
+      parent.postMessage({ type: 'cq-result', score, max: 1 }, '*');
+    }
+  </script>
+</body>
+</html>

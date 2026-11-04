@@ -1,0 +1,1 @@
+export declare function outputConfig(groups: { source: string; headers: { key: string; value: string }[] }[], spa?: boolean): { version: number; routes: { src?: string; headers?: Record<string, string>; continue?: boolean; handle?: string; dest?: string }[] };

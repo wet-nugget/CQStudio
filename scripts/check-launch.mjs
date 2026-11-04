@@ -9,9 +9,9 @@ if (process.argv.includes('--if-production') && env.VERCEL_ENV !== 'production' 
 const problems = deploymentProblems(env);
 problems.push(...operatorProblems(JSON.parse(readFileSync('src/config/operator.json', 'utf8'))));
 const runner = JSON.parse(readFileSync('runner/vercel.json', 'utf8'));
-const runnerCsp = runner.headers?.find(item => item.source === '/(.*)')?.headers?.find(item => item.key === 'Content-Security-Policy')?.value;
-if (!env.VITE_APP_ORIGIN || runnerCsp?.match(/(?:^|;\s*)frame-ancestors ([^;]+)/)?.[1] !== env.VITE_APP_ORIGIN.replace(/\/$/, ''))
-  problems.push('Prepare runner/vercel.json for the real app origin using npm run deploy:prepare.');
+const app = JSON.parse(readFileSync('vercel.json', 'utf8'));
+if (runner.buildCommand !== 'node build.mjs --vercel' || app.buildCommand !== 'npm run build:vercel')
+  problems.push('Restore the repository Vercel build commands; cloud builds generate exact-origin hosting headers automatically.');
 
 if (problems.length) {
   console.error('Production launch is blocked:\n' + problems.map(message => `- ${message}`).join('\n'));

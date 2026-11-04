@@ -41,9 +41,9 @@ TypeScript types in `src` and the shared function modules in `supabase/functions
 The operator configuration is public policy information, not a secret store.
 The setup person completes it with approved real details before launch.
 
-Both `vercel.json` files belong in GitHub. Their initial placeholders still need
-the setup person's actual hosting addresses and `npm run deploy:prepare` before
-deployment. Including `supabase/seed.sql` as source does not mean it should be
+Both generic `vercel.json` files belong in GitHub. Vercel reads the repository
+and generates exact-origin headers during the cloud build from dashboard values.
+The repo owner does not need a local preparation command or checkout. Including `supabase/seed.sql` as source does not mean it should be
 applied to production.
 
 ## Leave these out
@@ -84,7 +84,7 @@ possible private file. Do not force-add an ignored file to make a push succeed.
 
 Run this only in an initialized working repository, not the original folder's
 empty read-only `.git` directory. If necessary, use the clean-copy instructions
-in [section 4 of the setup guide](docs/BEGINNER-LAUNCH-GUIDE.md#4-make-a-clean-publishable-copy-and-github-repository).
+in [the developer reference](docs/LOCAL-DEVELOPMENT.md).
 
 ```bash
 git add .github docs public runner scripts setup src supabase tests \
@@ -111,11 +111,11 @@ If a real credential was previously committed, stop and rotate that credential
 and resolve the repository history before sharing it. Do not assume hiding the
 current file makes an old secret safe.
 
-## What the setup person receives from GitHub
+## What the repo owner does after the initial source push
 
-They clone the repository, run `npm run setup:doctor`, install the locked
-dependencies, and follow [START-HERE.md](START-HERE.md),
-[the configuration map](setup/README.md), [HANDOFF.md](HANDOFF.md) and the
-[full setup guide](docs/BEGINNER-LAUNCH-GUIDE.md).
-They do not need your `node_modules`, built `dist`, local environment file,
-computer-specific assistant folders or account passwords in the repository.
+Open [START-HERE.md](START-HERE.md), then follow
+[the browser-only GitHub deployment guide](docs/GITHUB-DEPLOYMENT.md). The owner
+connects Vercel to the repository, enters dashboard settings, and runs the
+Supabase/admin workflows from GitHub Actions. GitHub and Vercel retrieve/build the
+source themselves. No local folder, terminal, `.env.local`, `node_modules` or
+uploaded `dist` is required for that owner deployment path.

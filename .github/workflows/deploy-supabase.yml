@@ -1,0 +1,57 @@
+name: Deploy Supabase from GitHub
+on:
+  push:
+    branches: [main, development]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: supabase-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: vars.CQ_GITHUB_DEPLOYMENTS_ENABLED == 'true' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development')
+    uses: ./.github/workflows/checks.yml
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets[format('CQ_{0}_SUPABASE_ACCESS_TOKEN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      SUPABASE_DB_PASSWORD: ${{ secrets[format('CQ_{0}_SUPABASE_DB_PASSWORD', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      SUPABASE_PROJECT_REF: ${{ vars[format('CQ_{0}_SUPABASE_PROJECT_REF', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      MAINTENANCE_TOKEN: ${{ secrets[format('CQ_{0}_MAINTENANCE_TOKEN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_SUPABASE_URL: ${{ vars[format('CQ_{0}_SUPABASE_URL', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars[format('CQ_{0}_SUPABASE_ANON_KEY', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_APP_ORIGIN: ${{ vars[format('CQ_{0}_APP_ORIGIN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+      VITE_QUIZ_RUNNER_ORIGIN: ${{ vars[format('CQ_{0}_RUNNER_ORIGIN', github.ref_name == 'main' && 'PROD' || 'DEV')] }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate the selected environment and prepare ephemeral Edge secrets
+        run: node scripts/check-cloud.mjs --write-secrets
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+      - name: Link the selected project and apply pending migrations (no reset or seed)
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push --dry-run
+          supabase db push
+          supabase db lint --linked --level error
+      - name: Set origin and maintenance secrets without re-enabling bootstrap
+        run: supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" --env-file "$RUNNER_TEMP/cqstudio-edge.env"
+      - name: Deploy the five server functions
+        run: |
+          supabase functions deploy admin --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy account --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy vault --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy bootstrap-admin --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
+          supabase functions deploy maintenance --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
+      - name: Remove temporary secret file
+        if: always()
+        run: node -e "require('node:fs').rmSync(require('node:path').join(process.env.RUNNER_TEMP, 'cqstudio-edge.env'), {force:true})"

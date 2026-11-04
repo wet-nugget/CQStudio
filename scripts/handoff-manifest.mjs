@@ -2,7 +2,7 @@ import { existsSync, readdirSync, writeFileSync } from 'node:fs';
 
 const directories = ['.github', 'docs', 'public', 'runner', 'scripts', 'setup', 'src', 'supabase', 'tests'];
 const roots = ['.env.example', '.gitignore', '.npmrc', '.nvmrc', '.node-version', 'START-HERE.md', 'GITHUB-PUSH.md', 'HANDOFF.md', 'README.md', 'index.html', 'package.json', 'package-lock.json', 'playwright.config.ts', 'tsconfig.json', 'vercel.json', 'vite.config.ts'];
-const skipped = new Set(['node_modules', 'dist', '.git', '.aws', '.agents', '.codex', '.temp', '.branches', 'private', 'test-results', 'coverage', 'playwright-report', 'backups']);
+const skipped = new Set(['node_modules', 'dist', '.git', '.aws', '.agents', '.codex', '.vercel', '.supabase', '.cq-deployment', '.temp', '.branches', 'private', 'test-results', 'coverage', 'playwright-report', 'backups']);
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
     if (entry.isSymbolicLink() || skipped.has(entry.name)) return [];

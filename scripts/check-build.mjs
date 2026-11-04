@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-const config=JSON.parse(readFileSync('vercel.json','utf8'));
+const config=JSON.parse(readFileSync('.cq-deployment/app.json','utf8'));
 const headers=config.headers.find((entry)=>entry.source==='/(.*)').headers;
 for(const name of ['Content-Security-Policy','Strict-Transport-Security','X-Content-Type-Options','Referrer-Policy','Permissions-Policy','Cross-Origin-Opener-Policy','X-Robots-Tag']) {
   if(!headers.some((entry)=>entry.key===name && entry.value)) throw new Error(`Missing ${name}`);

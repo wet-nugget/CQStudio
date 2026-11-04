@@ -1,4 +1,9 @@
-# Configuration destinations and installer commands
+# Optional local developer configuration tools
+
+**Repo owners deploying from GitHub do not need these local files or commands.**
+Use [the browser-only deployment guide](../docs/GITHUB-DEPLOYMENT.md) and
+[the cloud dashboard template](templates/github-cloud.json.example) instead.
+The tools below are retained for developers who choose a local working copy.
 
 Start with [START-HERE.md](../START-HERE.md). This document is the exact map for
 configuration files; the [long guide](../docs/BEGINNER-LAUNCH-GUIDE.md) supplies
@@ -42,7 +47,7 @@ projects. Do not erase the private directory simply to bypass that check.
 | `edge.env` | That Supabase project's **Edge Functions → Secrets** | Add `APP_ORIGIN`, `BOOTSTRAP_TOKEN`, `MAINTENANCE_TOKEN`, or use the CLI command below. |
 | `bootstrap.env` | Local bootstrap process only | Run with Node's `--env-file` as shown below. Do not upload it to Vercel/GitHub. |
 | `vault-secrets.json` | That Supabase project's database **Vault** UI | Create the two named secrets: cleanup endpoint URL and matching maintenance token. This is not Edge Secrets or CQStudio's file vault. |
-| `github-secrets.env` — development only | GitHub repository **Actions → Secrets** | Add the two `CQ_DEV_` names/values for the development Daily database touch job. |
+| `github-secrets.env` — development only | GitHub repository Actions settings | Put `CQ_DEV_SUPABASE_URL` in **Variables** and `CQ_DEV_MAINTENANCE_TOKEN` in **Secrets**. |
 | `github-variables.json` — production only | GitHub repository **Actions → Variables** | Add the four browser-safe `CQ_PROD_` names/values for Production availability. |
 
 The wizard does not generate SMTP credentials or database passwords. Create
@@ -51,7 +56,7 @@ below. It also does not mark the operator policy reviewed or deploy any service.
 
 ### Supabase CLI commands
 
-Use the `cqsb` helper from section 3.2 of the long guide, or your installed
+Use the `cqsb` helper from [the developer reference](../docs/LOCAL-DEVELOPMENT.md#supabase-cli-for-developers), or your installed
 matching native Supabase CLI. Set `CQ_TARGET_REF` to the chosen environment's
 actual project reference using the long guide's prompt, and verify the linked
 target before database changes.
@@ -115,7 +120,7 @@ literal command argument.
 | SMTP host/port/username/password | Chosen delivery provider after sender verification | Supabase Auth custom SMTP settings |
 | Sender identity | Verified sender supported by that provider | Supabase Auth SMTP sender fields |
 | Auth Site URL and allowed callbacks | Main app origin from `app.env` | Supabase Auth URL settings: origin, `/accept-invite`, `/reset-password` |
-| Public/anonymous signup, password/session/MFA/rate limits | Requirements in long guide section 7 | Hosted Supabase Auth settings, not merely local config.toml |
+| Public/anonymous signup, password/session/MFA/rate limits | Section 7 of the browser-only GitHub deployment guide | Hosted Supabase Auth settings, not merely local config.toml |
 | Standard service-role credentials | Supabase Edge runtime provides standard server values | Keep server-only; never copy into the app/runner environment |
 | Operator/public privacy fields | Owner input form plus actual provider facts/review | `src/config/operator.json`; no credentials |
 | Maintenance schedules | Created by SQL migrations | Verify cron rows and actual maintenance function responses |
@@ -141,13 +146,13 @@ npm run launch:check
 
 Use `production/app.env` for production instead. Check for conflicting exported
 variables and other `.env.production*` files. The copy is intentional replacement;
-inspect before running it. Save the generated public headers for the matching
-Git branch before pushing. See the full guide for the development-to-main flow.
+inspect before running it. The generated local headers are ignored. Vercel builds its own headers from
+dashboard values; keep generic tracked configs and use the browser guide for releases.
 
 ## What to commit
 
-Commit the full source, templates and guides, including both prepared public
-`vercel.json` files. Do not commit generated private setup files. Before handoff:
+Commit the full source, templates and guides, including both generic
+`vercel.json` files. Generated exact-origin headers are build artifacts, not source. Do not commit generated private setup files. Before handoff:
 
 ```sh
 npm run handoff:manifest

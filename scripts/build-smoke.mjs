@@ -2,11 +2,13 @@
 // environment files remain untouched. Playwright intercepts every fixture URL.
 import { build } from 'vite';
 import { execFileSync } from 'node:child_process';
-import { chmodSync } from 'node:fs';
+import { chmodSync, writeFileSync } from 'node:fs';
+import { appHeaders } from './lib/headers.mjs';
 process.env.VITE_APP_ORIGIN='http://127.0.0.1:4173';
 process.env.VITE_QUIZ_RUNNER_ORIGIN='https://127.0.0.1:4174';
 process.env.VITE_SUPABASE_URL='';
 process.env.VITE_SUPABASE_ANON_KEY='';
+writeFileSync('/tmp/cqstudio-smoke-app.json', JSON.stringify(appHeaders(process.env)));
 await build({build:{outDir:'/tmp/cqstudio-setup-dist',emptyOutDir:true}});
 process.env.VITE_SUPABASE_URL='https://cq-fixture.supabase.co';
 process.env.VITE_SUPABASE_ANON_KEY='sb_publishable_cqstudio_test_fixture_only';

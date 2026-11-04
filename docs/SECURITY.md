@@ -12,7 +12,7 @@ Auth email invitations reserve a seat before calling the Auth Admin API. The acc
 
 ## Secrets and hardening
 
-Only the project URL and anon/publishable key go in browser variables. Service-role credentials exist only in Edge Function secret stores; never scripts, `.env` committed files, build output, or browser code. Deployment configuration is prepared from public origins before a deployment is created; the build checks it matches the environment. App CSP does not permit inline scripts, eval, remote executable content, objects, or framing by another site. HTML quiz isolation uses a separate origin, two script-only sandboxes, source-window/channel validation, bounded results, and a runner CSP that denies network access.
+Only the project URL and anon/publishable key go in browser variables. Service-role credentials exist only in Edge Function secret stores; never scripts, `.env` committed files, build output, or browser code. Vercel cloud builds generate Build Output API routing/security headers from validated dashboard origins; tracked Vercel files remain generic. App CSP does not permit inline scripts, eval, remote executable content, objects, or framing by another site. HTML quiz isolation uses a separate origin, two script-only sandboxes, source-window/channel validation, bounded results, and a runner CSP that denies network access.
 
 Admin Edge Functions check the bearer JWT with Auth, approved status, policy acceptance, session validity, MFA state, and admin role. Inputs use strict Zod schemas and bounded request bodies. CORS allows only `APP_ORIGIN`; origin checks supplement authentication. No dynamic SQL is constructed from input.
 

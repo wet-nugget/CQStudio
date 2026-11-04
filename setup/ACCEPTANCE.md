@@ -1,7 +1,8 @@
 # Installer completion record
 
-Copy this to `setup/private/ACCEPTANCE.md`. Keep sensitive evidence and member
-data outside the repository. Record links/identifiers, not credentials.
+Complete this checklist in a private GitHub issue or agreed private record; no
+local file is required. Developers may optionally use `setup/private/ACCEPTANCE.md`.
+Keep sensitive evidence/member data outside source. Record identifiers, not credentials.
 
 ## Environment and release
 
@@ -16,8 +17,8 @@ data outside the repository. Record links/identifiers, not credentials.
 
 ## Required evidence
 
-- [ ] `npm run setup:doctor`: full source present.
-- [ ] Local lint, app/Edge TypeScript, unit tests, build and browser checks pass.
+- [ ] GitHub Checks source-completeness job passes.
+- [ ] GitHub app/database checks and both Vercel builds pass.
 - [ ] Database migrations and hosted permissions verified in development.
 - [ ] Both environments use their own projects, addresses, keys and tokens.
 - [ ] Hosted Auth disables public/anonymous signup; SMTP and exact redirects work.

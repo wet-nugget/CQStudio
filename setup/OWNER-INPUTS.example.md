@@ -1,7 +1,8 @@
 # Owner decisions — complete once before giving the installer the job
 
-Copy this file to `setup/private/OWNER-INPUTS.md`, then fill it in. That copy is
-ignored by Git. Share its non-secret decisions directly with the installer.
+Use these questions together in a private GitHub issue or agreed private record;
+no local file is required. A developer may optionally copy this template into
+ignored `setup/private/OWNER-INPUTS.md`. Share the non-secret decisions with the installer.
 Do not write passwords, tokens or private member information into it.
 
 ## Responsibility and public details

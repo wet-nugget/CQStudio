@@ -9,5 +9,5 @@ if (problems.length) {
 } else {
   execFileSync(process.execPath, ['scripts/prepare-headers.mjs'], { env, stdio: 'inherit' });
   execFileSync(process.execPath, ['runner/build.mjs'], { env: { ...env, APP_ORIGIN: env.VITE_APP_ORIGIN }, stdio: 'inherit' });
-  console.log('Prepared both Vercel projects. Use these same public environment values on Vercel before deploying.');
+  console.log('Prepared local artifacts. Vercel Git builds generate their own exact-origin headers from dashboard values; no local files need uploading.');
 }

@@ -22,14 +22,22 @@ Published source is cached per immutable version ID using the Cache API. Drafts 
 
 **Sandboxing reduces risk but does not make uploaded code safe.** There is no malware scanning or end-to-end encryption. Members can inspect answers in client-scored quizzes; that is intentional for self-study.
 
-## Deploy the runner
+## Deploy the runner from GitHub
 
-The second Vercel project uses repository root directory `runner`, output `dist`, and build command `node build.mjs --check`. It needs no package dependencies. Before creating a deployment, run from the repository root with its exact parent origin:
+Import the same GitHub repository into a separate Vercel project with Root
+Directory `runner`, Framework Other, and the checked-in build command
+`node build.mjs --vercel`. Leave the output-directory override unset. Set
+`APP_ORIGIN` in the runner's Production environment to its matching main app's
+exact HTTPS origin. The cloud build generates its own `.vercel/output` with the
+correct parent-origin CSP; no local header preparation/upload is required.
 
-```sh
-APP_ORIGIN=https://YOUR_APP.vercel.app node runner/build.mjs
-```
+Set the runner's actual origin in the app project's `VITE_QUIZ_RUNNER_ORIGIN`.
+The app's cloud build generates its frame policy from that value. Never use the
+app's own origin for the runner. Use separate development/production project
+pairs and matching branches. Test hosting protection with a normal invited
+member so an external hosting login does not prevent iframe access.
 
-Commit/use that prepared `runner/vercel.json` and set the same `APP_ORIGIN` in the runner's Vercel environment. Set `VITE_QUIZ_RUNNER_ORIGIN` in the app, regenerate app headers before deployment, and rebuild. Never use the app's origin for the runner. Distinct development/production parent origins need matching prepared runner configuration. Preview deployments must have their own approved parent origins/access restrictions.
-
-Automated smoke tests produce separate setup/fixture artifacts and runner test headers without rewriting deployment configuration. They serve the app and runner on separate local origins with actual CSP response headers, and verify storage, network, top-navigation, and forged-message isolation.
+Follow [the browser-only deployment guide](GITHUB-DEPLOYMENT.md) for all settings.
+Browser smoke tests build disposable fixtures and a separate HTTPS test runner
+without modifying either tracked Vercel configuration. They verify storage,
+network, top-navigation and forged-message isolation under real response CSP.

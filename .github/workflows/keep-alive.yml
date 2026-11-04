@@ -7,9 +7,10 @@ permissions:
   contents: read
 jobs:
   touch:
+    if: vars.CQ_GITHUB_DEPLOYMENTS_ENABLED == 'true'
     runs-on: ubuntu-latest
     env:
-      CQ_DEV_SUPABASE_URL: ${{ secrets.CQ_DEV_SUPABASE_URL }}
+      CQ_DEV_SUPABASE_URL: ${{ vars.CQ_DEV_SUPABASE_URL }}
       CQ_DEV_MAINTENANCE_TOKEN: ${{ secrets.CQ_DEV_MAINTENANCE_TOKEN }}
     steps:
       - name: Touch dev database
