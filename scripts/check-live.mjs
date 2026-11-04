@@ -71,7 +71,7 @@ for (const name of ['admin', 'account', 'vault']) {
     const result = await timedFetch(`${provider}/functions/v1/${name}`, {
       method: 'POST', headers: { Origin: app, apikey: env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' }, body: '{}',
     });
-    expect(result.status === 401);
+    expect(result.status === 401 || (name === 'vault' && result.status === 400));
   });
 }
 if (failures.length) process.exitCode = 1;

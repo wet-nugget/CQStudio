@@ -3,8 +3,8 @@ import { authenticate, HttpError, jsonInput, serve, serviceClient } from '../_sh
 import { validateHtml } from '../_shared/html.ts';
 import { adoptUpload, readyPath } from '../_shared/storage.ts';
 serve(async (request) => {
-    const input = z.strictObject({ action: z.enum(['finalize', 'download']), file_id: z.uuid() }).parse(await jsonInput(request));
     const { user, client } = await authenticate(request);
+    const input = z.strictObject({ action: z.enum(['finalize', 'download']), file_id: z.uuid() }).parse(await jsonInput(request));
     const service = serviceClient();
     const { data: file, error } = await client.from('files').select('*').eq('id', input.file_id).single();
     if (error || !file)
