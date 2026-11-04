@@ -1,15 +1,15 @@
 {
-  "operatorName": "",
-  "contactEmail": "",
-  "country": "",
+  "operatorName": "CQStudio",
+  "contactEmail": "vaughnoswald.patalinjug@gmail.com",
+  "country": "Philippines",
   "minimumAge": 18,
-  "supabaseDetails": "",
-  "vercelDetails": "",
-  "emailDetails": "",
-  "technicalLogRetention": "",
-  "backupRetention": "",
-  "applicableTerms": "",
-  "hostingStorageDetails": "",
-  "privacyResponsibilities": "",
-  "reviewed": false
+  "supabaseDetails": "hosted on Supabase cloud infrastructure under Supabase's Data Processing Addendum and standard cross-border transfer safeguards",
+  "vercelDetails": "served through Vercel's global edge network and cloud build infrastructure under Vercel's privacy and data processing terms",
+  "emailDetails": "the workspace's configured transactional SMTP provider solely for invitation, verification, and password recovery messages",
+  "technicalLogRetention": "each hosting and email provider's standard operational and security log retention schedule",
+  "backupRetention": "up to 30 days in restricted operator-managed encrypted backups",
+  "applicableTerms": "These terms are governed by the laws of the Republic of the Philippines and apply to all invited members of this private study workspace",
+  "hostingStorageDetails": "Neither provider sets advertising or cross-site tracking cookies for CQStudio workspace routes",
+  "privacyResponsibilities": "CQStudio acts as the personal information controller for workspace membership and shared study records, with privacy enquiries handled via vaughnoswald.patalinjug@gmail.com",
+  "reviewed": true
 }
