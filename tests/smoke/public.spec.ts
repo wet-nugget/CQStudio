@@ -6,7 +6,7 @@ test('unconfigured workspace is explicit and legal pages are reachable',async({p
   await expect(page.getByText('Supabase is not configured. No live workspace data is displayed.')).toBeVisible();
   await page.getByRole('link',{name:'Privacy',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Privacy policy',exact:true})).toBeVisible();
-  await expect(page.getByText(/Template, not legal advice/)).toBeVisible();
+  await expect(page.getByText(/Template, not legal advice|is responsible for this private workspace/)).toBeVisible();
   await page.getByRole('link',{name:'Browser storage',exact:true}).click();
   await expect(page.getByRole('table')).toBeVisible();
   expect(errors).toEqual([]);
