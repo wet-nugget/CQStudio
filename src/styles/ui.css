@@ -418,6 +418,7 @@ progress::-moz-progress-bar {
   padding: 8px 14px;
   font-size: 13px;
   text-decoration: none;
+  transition: none;
 }
 
 .segmented-tabs button.active, .tabs button.active, .tabs a.active {

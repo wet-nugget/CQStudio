@@ -39,9 +39,9 @@ jobs:
           version: 2.122.0
       - name: Link the selected project and apply pending migrations (no reset or seed)
         run: |
-          supabase link --project-ref "$SUPABASE_PROJECT_REF"
-          supabase db push --dry-run
-          supabase db push
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --linked --dry-run --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --linked --password "$SUPABASE_DB_PASSWORD"
           supabase db lint --linked --level error
       - name: Set origin and maintenance secrets without re-enabling bootstrap
         run: supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" --env-file "$RUNNER_TEMP/cqstudio-edge.env"
