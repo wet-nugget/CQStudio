@@ -1,7 +1,11 @@
 import { z } from 'zod';
 export const emailSchema = z.string().trim().toLowerCase().email().max(254);
+export const loginIdentifierSchema = z.string().trim().toLowerCase().max(254).refine(
+    (value) => emailSchema.safeParse(value).success || /^[a-z0-9_]{3,30}$/.test(value),
+    'Enter a valid email address or username.',
+);
 export const passwordSchema = z.string().min(12, 'Use at least 12 characters.').max(128);
-export const loginSchema = z.strictObject({ email: emailSchema, password: z.string().min(1).max(128) });
+export const loginSchema = z.strictObject({ email: loginIdentifierSchema, password: z.string().min(1).max(128) });
 export const profileSchema = z.strictObject({
     username: z.string().regex(/^[a-z0-9_]{3,30}$/, 'Use 3–30 lowercase letters, numbers, or underscores.'),
     display_name: z.string().trim().min(1).max(80),

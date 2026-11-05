@@ -25,6 +25,8 @@ export function AuthProvider({ children }: {
             return;
         let active = true;
         function transition(next: Session | null) {
+            if (active && (!next || localStorage.getItem(OWNER_KEY) !== (next?.user.id ?? null)))
+                setReady(false);
             // Serialize cross-tab and refresh events. Never call Auth APIs while its
             // onAuthStateChange callback is holding the Auth client's internal lock.
             chain.current = chain.current.then(async () => {

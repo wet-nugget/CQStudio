@@ -33,6 +33,7 @@ async function fixture(page:Page,{invited=false,stalePolicy=false,admin=false,da
       else {unexpected.push(url.pathname);status=400;}
     }else if(url.pathname.includes('/rpc/')){
       if(name==='public_policy_settings')data={name:'CQStudio',policy_version:'2026-11-01',chat_days:90,activity_days:60,notification_days:30,full_attempts:30};
+      else if(name==='login_email')data='member@example.test';
       else if(name==='invitation_context')data={id:'76000000-0000-4000-8000-000000000001',role:'member',expires_at:'2099-01-01T00:00:00Z'};
       else if(name==='accept_invitation'){joined=true;data=uid;}
       else if(name==='accept_policy'){current=String(body?.p_version);data=null;}

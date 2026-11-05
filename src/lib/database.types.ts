@@ -56,7 +56,8 @@ import_private_data: { Args: { p_payload: Json; p_mode: string; p_confirm: boole
 unpublish_quiz: { Args: { p_actor: string; p_quiz: string; p_delete?: boolean }; Returns: undefined };
 global_search: { Args: { p_term: string; p_page?: number }; Returns: Json };
 my_attempts: { Args: { p_class?: string | null; p_page?: number }; Returns: Database['public']['Tables']['attempts']['Row'][] };
-unused_html_assets: { Args: { p_page?: number }; Returns: Database['public']['Tables']['files']['Row'][] }
+unused_html_assets: { Args: { p_page?: number }; Returns: Database['public']['Tables']['files']['Row'][] };
+login_email: { Args: { p_identifier: string }; Returns: string }
 }; Enums: { member_role: "admin" | "member"; member_status: "approved" | "disabled" | "rejected"; quiz_status: "draft" | "pending" | "published" | "rejected"; file_state: "pending" | "ready" | "deleting" }; CompositeTypes: Record<never, never> } };
 export type TableName = keyof Database['public']['Tables'];
 export type Row<T extends TableName> = Database['public']['Tables'][T]['Row'];

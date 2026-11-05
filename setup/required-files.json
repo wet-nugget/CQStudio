@@ -252,6 +252,7 @@
     "supabase/migrations/20261101002400_invitation_minimization.sql",
     "supabase/migrations/20261101002500_unused_html_assets.sql",
     "supabase/migrations/20261101002600_html_asset_visibility.sql",
+    "supabase/migrations/20261101002700_username_login.sql",
     "supabase/seed.sql",
     "supabase/tests/database/authorization_test.sql",
     "supabase/tests/database/capacity_test.sql",
